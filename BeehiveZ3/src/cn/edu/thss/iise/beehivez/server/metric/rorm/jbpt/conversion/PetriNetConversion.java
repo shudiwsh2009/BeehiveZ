@@ -17,6 +17,9 @@ public class PetriNetConversion {
 				.getTransitions()) {
 			org.jbpt.petri.Transition t = new org.jbpt.petri.Transition(
 					_t.getIdentifier());
+			if(_t.isInvisibleTask()) {
+				t.setLabel("");
+			}
 			ns.addTransition(t);
 			nodeMap.put(_t, t);
 		}
@@ -49,7 +52,9 @@ public class PetriNetConversion {
 		for (org.jbpt.petri.unfolding.Event _e : _cpu.getEvents()) {
 			org.processmining.framework.models.petrinet.Transition t = new org.processmining.framework.models.petrinet.Transition(
 					_e.getLabel(), pn);
-			t.setLogEvent(new LogEvent(t.getIdentifier(), "auto"));
+			if(_e.getTransition().isObservable()) {
+				t.setLogEvent(new LogEvent(t.getIdentifier(), "auto"));
+			}
 			pn.addTransition(t);
 			nodeMap.put(_e, t);
 		}

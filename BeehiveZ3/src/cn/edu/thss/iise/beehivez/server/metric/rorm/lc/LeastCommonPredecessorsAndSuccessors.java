@@ -468,16 +468,16 @@ public class LeastCommonPredecessorsAndSuccessors {
 		return forwardSkip;
 	}
 
-	public void setForwardSkip(Map<IBPNode, Map<IBPNode, Boolean>> forwardSkip) {
-		this.forwardSkip = forwardSkip;
+	public Map<IBPNode, Map<IBPNode, Set<IBPNode>>> getLcpMap() {
+		return lcpMap;
+	}
+
+	public Map<IBPNode, Map<IBPNode, Set<IBPNode>>> getLcsMap() {
+		return lcsMap;
 	}
 
 	public Map<IBPNode, Map<IBPNode, Boolean>> getBackwardSkip() {
 		return backwardSkip;
-	}
-
-	public void setBackwardSkip(Map<IBPNode, Map<IBPNode, Boolean>> backwardSkip) {
-		this.backwardSkip = backwardSkip;
 	}
 
 	public Map<IBPNode, Map<IBPNode, Boolean>> getReachMap() {

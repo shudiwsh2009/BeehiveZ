@@ -75,11 +75,11 @@ public class UnfoldingGeneratorTest {
 	}
 
 	public static void jbptTest() throws Exception {
-		String filePath1 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\parallel_S_with_exclusive.pnml";
-		String filePath2 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\M9.png";
+		String filePath1 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\M0_INV.pnml";
+		String filePath2 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\M0_INV.png";
 		// String filePath3 =
 		// "C:\\Users\\Shudi\\Desktop\\rorm\\test\\multi_relation_1_cfp.pnml";
-		String filePath4 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\M9_cfp.png";
+		String filePath4 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\M0_INV_cfp.png";
 
 		// String filePath1 =
 		// "/Users/shudi/Desktop/parallel_A_with_outer_loop.pnml";
@@ -95,7 +95,7 @@ public class UnfoldingGeneratorTest {
 		ProvidedObject po1 = new ProvidedObject("petrinet", p1);
 		DotPngExport dpe1 = new DotPngExport();
 		OutputStream image1 = new FileOutputStream(filePath2);
-//		dpe1.export(po1, image1);
+		dpe1.export(po1, image1);
 
 		NetSystem ns = PetriNetConversion.convert(p1);
 		CompletePrefixUnfolding cpu = new CompletePrefixUnfolding(ns);
@@ -111,7 +111,7 @@ public class UnfoldingGeneratorTest {
 		PetriNet p2 = PetriNetConversion.convert(cpu);
 
 		// cfp
-		// PetriNetUtil.export2pnml(p2, filePath3);
+//		 PetriNetUtil.export2pnml(p2, filePath3);
 		ProvidedObject po2 = new ProvidedObject("petrinet", p2);
 		DotPngExport dpe2 = new DotPngExport();
 		OutputStream image2 = new FileOutputStream(filePath4);

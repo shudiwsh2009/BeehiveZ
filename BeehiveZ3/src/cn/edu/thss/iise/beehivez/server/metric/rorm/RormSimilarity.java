@@ -15,7 +15,6 @@ import org.processmining.framework.models.petrinet.PetriNet;
 import org.processmining.importing.pnml.PnmlImport;
 
 import cn.edu.thss.iise.beehivez.server.metric.PetriNetSimilarity;
-import cn.edu.thss.iise.beehivez.server.metric.rorm.old.RefinedOrderingRelationsMatrix;
 
 /**
  * @author Wang Shuhao
@@ -50,18 +49,18 @@ public class RormSimilarity extends PetriNetSimilarity {
 			String row = interNames.get(i);
 			for (int j = 0; j < interNames.size(); ++j) {
 				String col = interNames.get(j);
-				if (ecfm1.getFollowMatrix()[tName1.indexOf(row)][tName1
-						.indexOf(col)].equals(ecfm2.getFollowMatrix()[tName2
+				if (ecfm1.getCausalMatrix()[tName1.indexOf(row)][tName1
+						.indexOf(col)].equals(ecfm2.getCausalMatrix()[tName2
 						.indexOf(row)][tName2.indexOf(col)])) {
 					++followInter;
 				}
-				if (ecfm1.getPrecedeMatrix()[tName1.indexOf(row)][tName1
-						.indexOf(col)].equals(ecfm2.getPrecedeMatrix()[tName2
+				if (ecfm1.getInverseCausalMatrix()[tName1.indexOf(row)][tName1
+						.indexOf(col)].equals(ecfm2.getInverseCausalMatrix()[tName2
 						.indexOf(row)][tName2.indexOf(col)])) {
 					++precedeInter;
 				}
-				if (ecfm1.getParallelMatrix()[tName1.indexOf(row)][tName1
-						.indexOf(col)].equals(ecfm2.getParallelMatrix()[tName2
+				if (ecfm1.getConcurrentMatrix()[tName1.indexOf(row)][tName1
+						.indexOf(col)].equals(ecfm2.getConcurrentMatrix()[tName2
 						.indexOf(row)][tName2.indexOf(col)])) {
 					++parallelInter;
 				}
@@ -110,7 +109,7 @@ public class RormSimilarity extends PetriNetSimilarity {
 		// String filePath = "/Users/shudi/Desktop/M15.pnml";
 		PnmlImport pnmlImport = new PnmlImport();
 
-		String filePath = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\parallel_inv_1_a.pnml";
+		String filePath = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\M0.pnml";
 		PetriNet pn = pnmlImport.read(new FileInputStream(new File(filePath)));
 		RefinedOrderingRelationsMatrix rorm = new RefinedOrderingRelationsMatrix(
 				(PetriNet) pn.clone());
