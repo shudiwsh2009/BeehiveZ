@@ -1,6 +1,7 @@
 package cn.edu.thss.iise.beehivez.server.metric.rorm;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -70,6 +71,7 @@ public class RefinedOrderingRelationsMatrix {
 	private void generateCausalAndInverseCausalMatrix() {
 		List<Transition> alObTransitions = new ArrayList<Transition>(
 				this._sys.getObservableTransitions());
+		Collections.sort(alObTransitions, (t1, t2) -> t1.getLabel().compareTo(t2.getLabel()));
 		Place sinkPlace = this._sys.getSinkPlaces().iterator().next();
 		Condition sinkCondition = this._cpu.getConditions(sinkPlace).iterator()
 				.next();
@@ -309,6 +311,7 @@ public class RefinedOrderingRelationsMatrix {
 	private void generateConcurrentMatrix() {
 		List<Transition> alObTransitions = new ArrayList<Transition>(
 				this._sys.getObservableTransitions());
+		Collections.sort(alObTransitions, (t1, t2) -> t1.getLabel().compareTo(t2.getLabel()));
 		for (int i = 0; i < alObTransitions.size(); ++i) {
 			Transition fromTransition = alObTransitions.get(i);
 			Set<Event> fromEvents = this._cpu.getEvents(fromTransition);
@@ -316,6 +319,9 @@ public class RefinedOrderingRelationsMatrix {
 				Transition toTransition = alObTransitions.get(j);
 				Set<Event> toEvents = this._cpu.getEvents(toTransition);
 
+				if(fromTransition.getLabel().equals("a") && toTransition.getLabel().equals("b")) {
+					int a = 1;
+				}
 				// a may have some shadow events
 				// which need to be checked one by one
 				// when determining the relation of a||b
@@ -324,7 +330,7 @@ public class RefinedOrderingRelationsMatrix {
 				for (Event a : fromEvents) {
 					for (Event b : toEvents) {
 						boolean hasFoundAConcurrent = false;
-						Set<IBPNode> lcpSet = this._lc.getLcpMap().get(a)
+						Set<IBPNode> lcpSet = this._lc.getLcpCpuMap().get(a)
 								.get(b);
 						for (IBPNode lcp : lcpSet) {
 							if (lcp instanceof Event && lcp != a && lcp != b) {
@@ -341,9 +347,9 @@ public class RefinedOrderingRelationsMatrix {
 					}
 				}
 				for (Event b : toEvents) {
-					for (Event a : toEvents) {
+					for (Event a : fromEvents) {
 						boolean hasFoundAConcurrent = false;
-						Set<IBPNode> lcpSet = this._lc.getLcpMap().get(b)
+						Set<IBPNode> lcpSet = this._lc.getLcpCpuMap().get(b)
 								.get(a);
 						for (IBPNode lcp : lcpSet) {
 							if (lcp instanceof Event && lcp != b && lcp != a) {
@@ -543,12 +549,12 @@ public class RefinedOrderingRelationsMatrix {
 			while (itBj.hasNext()
 					&& (!aHasSometimesConcurrent || !bHasSometimesConcurrent)) {
 				IBPNode bj = itBj.next();
-				Set<IBPNode> _lcsSet = this._lc.getLcsMap().get(ai).get(bj);
+				Set<IBPNode> _lcsSet = this._lc.getLcsSysMap().get(ai).get(bj);
 				boolean hasConditionLcs = false;
 				for (IBPNode _lcs : _lcsSet) {
 					if (_lcs instanceof Event
-							&& this._lc.getReachMap().get(ai).get(_lcs)
-							&& this._lc.getReachMap().get(bj).get(_lcs)) {
+							&& this._lc.getSysReachMap().get(ai.getPetriNetNode()).get(_lcs.getPetriNetNode())
+							&& this._lc.getSysReachMap().get(bj.getPetriNetNode()).get(_lcs.getPetriNetNode())) {
 						aHasSometimesConcurrent = true;
 						bHasSometimesConcurrent = true;
 						return new boolean[] { true, true };
@@ -577,7 +583,7 @@ public class RefinedOrderingRelationsMatrix {
 			while (itBj.hasNext()
 					&& (!aHasSometimesConcurrent || !bHasSometimesConcurrent)) {
 				IBPNode bj = itBj.next();
-				Set<IBPNode> _lcpSet = this._lc.getLcpMap().get(ai).get(bj);
+				Set<IBPNode> _lcpSet = this._lc.getLcpSysMap().get(ai).get(bj);
 				boolean hasConditionLcp = false;
 				for (IBPNode _lcp : _lcpSet) {
 					if (_lcp instanceof Condition || _lcp == lcp) {
@@ -723,6 +729,7 @@ public class RefinedOrderingRelationsMatrix {
 				this.tName.add(t.getLabel());
 			}
 		}
+		Collections.sort(tName);
 	}
 	
 	public void printMatrix() {
