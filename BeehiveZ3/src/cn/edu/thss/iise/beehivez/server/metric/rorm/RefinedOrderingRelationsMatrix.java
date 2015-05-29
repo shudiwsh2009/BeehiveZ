@@ -116,6 +116,10 @@ public class RefinedOrderingRelationsMatrix {
 					continue;
 				}
 
+//				if(fromTransition.getLabel().equals("a")
+//						&& toTransition.getLabel().equals("o")) {
+//					int a = 1;
+//				}
 				// a may have some shadow events
 				// which need to be checked one by one
 				// in the meanwhile

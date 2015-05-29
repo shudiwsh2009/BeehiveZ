@@ -75,11 +75,11 @@ public class UnfoldingGeneratorTest {
 	}
 
 	public static void jbptTest() throws Exception {
-		String filePath1 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\M0_INV.pnml";
-		String filePath2 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\M0_INV.png";
+		String filePath1 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\M4.pnml";
+		String filePath2 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\M4.png";
 		// String filePath3 =
 		// "C:\\Users\\Shudi\\Desktop\\rorm\\test\\multi_relation_1_cfp.pnml";
-		String filePath4 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\M0_INV_cfp.png";
+		String filePath4 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\M4_cfp.png";
 
 		// String filePath1 =
 		// "/Users/shudi/Desktop/parallel_A_with_outer_loop.pnml";
@@ -99,14 +99,6 @@ public class UnfoldingGeneratorTest {
 
 		NetSystem ns = PetriNetConversion.convert(p1);
 		CompletePrefixUnfolding cpu = new CompletePrefixUnfolding(ns);
-		LeastCommonPredecessorsAndSuccessors lc = new LeastCommonPredecessorsAndSuccessors(
-				cpu);
-		for (Event e1 : cpu.getEvents()) {
-			for (Event e2 : cpu.getEvents()) {
-				System.out.println(e1.getLabel() + " "
-						+ cpu.getOrderingRelation(e1, e2) + " " + e2);
-			}
-		}
 
 		PetriNet p2 = PetriNetConversion.convert(cpu);
 

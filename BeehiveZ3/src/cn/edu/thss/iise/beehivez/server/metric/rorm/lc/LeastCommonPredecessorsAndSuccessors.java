@@ -24,7 +24,7 @@ public class LeastCommonPredecessorsAndSuccessors {
 	private NetSystem _sys;
 	private CompletePrefixUnfolding _cpu;
 	private Set<Condition> _loopJoinConditions;
-	private Map<IBPNode, Map<IBPNode, Boolean>> reachMap;
+	private Map<IBPNode, Map<IBPNode, Boolean>> reachMap; // reachable map for cpu
 
 	private Map<IBPNode, Map<IBPNode, Set<IBPNode>>> lcpMap = new HashMap<IBPNode, Map<IBPNode, Set<IBPNode>>>();
 	private Map<IBPNode, Map<IBPNode, Set<IBPNode>>> lcsMap = new HashMap<IBPNode, Map<IBPNode, Set<IBPNode>>>();
@@ -67,6 +67,10 @@ public class LeastCommonPredecessorsAndSuccessors {
 			Event v1 = events.get(i);
 			for (int j = i + 1; j < events.size(); ++j) {
 				Event v2 = events.get(j);
+				if(v1.getTransition().getLabel().equals("d")
+						&& v2.getTransition().getLabel().equals("o")) {
+					int a = 1;
+				}
 				boolean[] skipForward = hasSkipForward(v1, v2);
 				this.forwardSkip.get(v1).put(v2, skipForward[0]);
 				this.forwardSkip.get(v2).put(v1, skipForward[1]);

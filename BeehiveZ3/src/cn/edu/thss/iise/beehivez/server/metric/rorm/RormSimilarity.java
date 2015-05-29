@@ -109,7 +109,7 @@ public class RormSimilarity extends PetriNetSimilarity {
 		// String filePath = "/Users/shudi/Desktop/M15.pnml";
 		PnmlImport pnmlImport = new PnmlImport();
 
-		String filePath = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\M0.pnml";
+		String filePath = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\multi_relation.pnml";
 		PetriNet pn = pnmlImport.read(new FileInputStream(new File(filePath)));
 		RefinedOrderingRelationsMatrix rorm = new RefinedOrderingRelationsMatrix(
 				(PetriNet) pn.clone());
