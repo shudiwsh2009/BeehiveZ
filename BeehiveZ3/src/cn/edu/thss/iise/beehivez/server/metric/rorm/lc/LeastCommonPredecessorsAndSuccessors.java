@@ -80,7 +80,8 @@ public class LeastCommonPredecessorsAndSuccessors {
 				boolean[] skipBackward = hasSkipBackward(e1, e2);
 				this.backwardSkip.get(e1).put(e2, skipBackward[0]);
 				this.backwardSkip.get(e2).put(e1, skipBackward[1]);
-				if(e1.getTransition().getLabel().equals("b") && e2.getTransition().getLabel().equals("a")) {
+				if (e1.getTransition().getLabel().equals("b")
+						&& e2.getTransition().getLabel().equals("a")) {
 					int a = 1;
 				}
 				computeLcpCpu(e1, e2);
@@ -178,7 +179,7 @@ public class LeastCommonPredecessorsAndSuccessors {
 				}
 			}
 		}
-		lcsSet = filterLcsSet(lcsSet);
+		lcsSet = filterLcsSysSet(lcsSet);
 		// analysis
 		this.lcsSysMap.get(e1).get(e2).addAll(lcsSet);
 		this.lcsSysMap.get(e2).get(e1).addAll(lcsSet);
@@ -210,7 +211,7 @@ public class LeastCommonPredecessorsAndSuccessors {
 	 * @param oriLcsSet
 	 * @return
 	 */
-	private Set<IBPNode> filterLcsSet(Set<IBPNode> oriLcsSet) {
+	private Set<IBPNode> filterLcsSysSet(Set<IBPNode> oriLcsSet) {
 		Set<IBPNode> lcsSet = new HashSet<IBPNode>();
 		for (IBPNode lcs : oriLcsSet) {
 			Iterator<IBPNode> it = lcsSet.iterator();
@@ -342,7 +343,7 @@ public class LeastCommonPredecessorsAndSuccessors {
 				}
 			}
 		}
-		lcpSet = filterLcpSet(lcpSet);
+		lcpSet = filterLcpSysSet(lcpSet);
 		// analysis
 		this.lcpSysMap.get(e1).get(e2).addAll(lcpSet);
 		this.lcpSysMap.get(e2).get(e1).addAll(lcpSet);
@@ -374,7 +375,7 @@ public class LeastCommonPredecessorsAndSuccessors {
 	 * @param oriLcpSet
 	 * @return
 	 */
-	private Set<IBPNode> filterLcpSet(Set<IBPNode> oriLcpSet) {
+	private Set<IBPNode> filterLcpSysSet(Set<IBPNode> oriLcpSet) {
 		Set<IBPNode> lcpSet = new HashSet<IBPNode>();
 		for (IBPNode lcp : oriLcpSet) {
 			Iterator<IBPNode> it = lcpSet.iterator();
@@ -496,9 +497,40 @@ public class LeastCommonPredecessorsAndSuccessors {
 				}
 			}
 		}
+		lcpSet = filterLcpCpuSet(lcpSet);
 		// analysis
 		this.lcpCpuMap.get(e1).get(e2).addAll(lcpSet);
 		this.lcpCpuMap.get(e2).get(e1).addAll(lcpSet);
+	}
+
+	/**
+	 * filter lcp set to only keep the least common predecessors
+	 * 
+	 * @param oriLcpSet
+	 * @return
+	 */
+	private Set<IBPNode> filterLcpCpuSet(Set<IBPNode> oriLcpSet) {
+		Set<IBPNode> lcpSet = new HashSet<IBPNode>();
+		for (IBPNode lcp : oriLcpSet) {
+			Iterator<IBPNode> it = lcpSet.iterator();
+			boolean filter = false;
+			while (it.hasNext()) {
+				IBPNode v = it.next();
+				if (this.cpuReachMap.get(lcp).get(v)) {
+					filter = true;
+					break;
+				}
+				if (this.cpuReachMap.get(v).get(lcp)) {
+					it.remove();
+				}
+			}
+			if (filter) {
+				continue;
+			} else {
+				lcpSet.add(lcp);
+			}
+		}
+		return lcpSet;
 	}
 
 	/**
@@ -540,7 +572,7 @@ public class LeastCommonPredecessorsAndSuccessors {
 	 * @return
 	 */
 	private void initReachMap() {
-		this.sysReachMap = new HashMap<INode, Map<INode,Boolean>>();
+		this.sysReachMap = new HashMap<INode, Map<INode, Boolean>>();
 		List<INode> sysNodes = new ArrayList<INode>();
 		for (Transition t : this._sys.getTransitions()) {
 			sysNodes.add((INode) t);
@@ -557,7 +589,7 @@ public class LeastCommonPredecessorsAndSuccessors {
 			}
 		}
 
-		this.cpuReachMap = new HashMap<IBPNode, Map<IBPNode,Boolean>>();
+		this.cpuReachMap = new HashMap<IBPNode, Map<IBPNode, Boolean>>();
 		List<IBPNode> cpuNodes = new ArrayList<IBPNode>();
 		for (Event e : this._cpu.getEvents()) {
 			cpuNodes.add(e);

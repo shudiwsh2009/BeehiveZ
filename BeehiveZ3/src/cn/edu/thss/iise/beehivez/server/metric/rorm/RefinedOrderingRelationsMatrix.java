@@ -66,6 +66,7 @@ public class RefinedOrderingRelationsMatrix {
 		}
 		generateCausalAndInverseCausalMatrix();
 		generateConcurrentMatrix();
+		postProcessMatrix();
 	}
 
 	private void generateCausalAndInverseCausalMatrix() {
@@ -319,7 +320,7 @@ public class RefinedOrderingRelationsMatrix {
 				Transition toTransition = alObTransitions.get(j);
 				Set<Event> toEvents = this._cpu.getEvents(toTransition);
 
-				if(fromTransition.getLabel().equals("a") && toTransition.getLabel().equals("b")) {
+				if(fromTransition.getLabel().equals("a") && toTransition.getLabel().equals("c")) {
 					int a = 1;
 				}
 				// a may have some shadow events
@@ -604,6 +605,18 @@ public class RefinedOrderingRelationsMatrix {
 			bHasSometimesConcurrent = true;
 		}
 		return new boolean[] { aHasSometimesConcurrent, bHasSometimesConcurrent };
+	}
+	
+	private void postProcessMatrix() {
+		for(int i = 0; i < this.tName.size(); ++i) {
+			for(int j = 0; j < this.tName.size(); ++j) {
+				if(this.causalMatrix[i][j].relation != Relation.NEVER
+						&& this.concurrentMatrix[i][j].relation != Relation.NEVER) {
+					this.causalMatrix[i][j].relation = Relation.SOMETIMES;
+					this.concurrentMatrix[i][j].relation = Relation.SOMETIMES;
+				}
+			}
+		}
 	}
 
 	/**
