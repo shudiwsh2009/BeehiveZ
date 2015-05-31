@@ -14,7 +14,7 @@ import org.processmining.framework.models.petrinet.Token;
 import org.processmining.framework.plugin.ProvidedObject;
 import org.processmining.importing.pnml.PnmlImport;
 
-import cn.edu.thss.iise.beehivez.server.metric.rorm.jbpt.conversion.PetriNetConversion;
+import cn.edu.thss.iise.beehivez.server.metric.rorm.conversion.JbptConversion;
 import cn.edu.thss.iise.beehivez.server.metric.rorm.old.unfolding.CompleteFinitePrefix;
 import cn.edu.thss.iise.beehivez.server.metric.rorm.old.unfolding.CompleteFinitePrefixBuilder;
 import cn.edu.thss.iise.beehivez.server.util.PetriNetUtil;
@@ -82,10 +82,10 @@ public class UnfoldingGeneratorTest {
 		OutputStream image1 = new FileOutputStream(filePath2);
 		dpe1.export(po1, image1);
 
-		NetSystem ns = PetriNetConversion.convert(p1);
+		NetSystem ns = JbptConversion.convert(p1);
 		CompletePrefixUnfolding cpu = new CompletePrefixUnfolding(ns);
 
-		PetriNet p2 = PetriNetConversion.convert(cpu);
+		PetriNet p2 = JbptConversion.convert(cpu);
 
 		// cfp
 //		 PetriNetUtil.export2pnml(p2, filePath3);

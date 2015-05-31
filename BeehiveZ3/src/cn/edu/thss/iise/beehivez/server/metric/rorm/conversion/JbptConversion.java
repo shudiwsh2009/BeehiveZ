@@ -1,4 +1,4 @@
-package cn.edu.thss.iise.beehivez.server.metric.rorm.jbpt.conversion;
+package cn.edu.thss.iise.beehivez.server.metric.rorm.conversion;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.processmining.framework.log.LogEvent;
 
-public class PetriNetConversion {
+public class JbptConversion {
 
 	@SuppressWarnings("unchecked")
 	public static org.jbpt.petri.NetSystem convert(

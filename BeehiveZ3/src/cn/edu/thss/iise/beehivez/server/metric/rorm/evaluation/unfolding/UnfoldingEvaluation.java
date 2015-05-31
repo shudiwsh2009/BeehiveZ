@@ -12,7 +12,7 @@ import org.processmining.framework.models.petrinet.Place;
 import org.processmining.framework.models.petrinet.Token;
 import org.processmining.importing.pnml.PnmlImport;
 
-import cn.edu.thss.iise.beehivez.server.metric.rorm.jbpt.conversion.PetriNetConversion;
+import cn.edu.thss.iise.beehivez.server.metric.rorm.conversion.JbptConversion;
 import cn.edu.thss.iise.beehivez.server.metric.rorm.old.unfolding.CompleteFinitePrefix;
 import cn.edu.thss.iise.beehivez.server.metric.rorm.old.unfolding.CompleteFinitePrefixBuilder;
 
@@ -29,7 +29,7 @@ public class UnfoldingEvaluation {
 		for(File f : files) {
 			PetriNet pn = pnmlImport.read(new FileInputStream(f)); 
 			models.add(pn);
-			nets.add(PetriNetConversion.convert(pn));
+			nets.add(JbptConversion.convert(pn));
 		}
 		
 		System.out.println("1");
