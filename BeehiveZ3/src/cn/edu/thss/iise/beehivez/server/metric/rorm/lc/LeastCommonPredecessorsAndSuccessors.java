@@ -35,9 +35,9 @@ public class LeastCommonPredecessorsAndSuccessors {
 	private Map<IBPNode, Map<IBPNode, Boolean>> backwardSysSkip = new HashMap<IBPNode, Map<IBPNode, Boolean>>();
 	// lcp and lcs based on cpuReachmap
 	private Map<IBPNode, Map<IBPNode, Set<IBPNode>>> lcpCpuMap = new HashMap<IBPNode, Map<IBPNode, Set<IBPNode>>>();
-	private Map<IBPNode, Map<IBPNode, Set<IBPNode>>> lcsCpuMap = new HashMap<IBPNode, Map<IBPNode,Set<IBPNode>>>();
+	private Map<IBPNode, Map<IBPNode, Set<IBPNode>>> lcsCpuMap = new HashMap<IBPNode, Map<IBPNode, Set<IBPNode>>>();
 	private Map<IBPNode, Map<IBPNode, Boolean>> forwardCpuSkip = new HashMap<IBPNode, Map<IBPNode, Boolean>>();
-	private Map<IBPNode, Map<IBPNode, Boolean>> backwardCpuSkip = new HashMap<IBPNode, Map<IBPNode,Boolean>>();
+	private Map<IBPNode, Map<IBPNode, Boolean>> backwardCpuSkip = new HashMap<IBPNode, Map<IBPNode, Boolean>>();
 
 	public LeastCommonPredecessorsAndSuccessors(CompletePrefixUnfolding cpu) {
 		this._cpu = cpu;
@@ -410,7 +410,7 @@ public class LeastCommonPredecessorsAndSuccessors {
 		}
 		return lcpSet;
 	}
-	
+
 	/**
 	 * used to check if e1 skips e2 and if e2 skips e1, forwards
 	 * 
@@ -436,16 +436,14 @@ public class LeastCommonPredecessorsAndSuccessors {
 			} else if (u instanceof Condition
 					&& ((Condition) u).getPlace() == sink) {
 				hasSinkSucc1 = true;
-				if (this.cpuReachMap.get(e2).get(
-						u)) {
+				if (this.cpuReachMap.get(e2).get(u)) {
 					lcsSet.add(u);
 				}
 			} else if (u instanceof Condition && ((Condition) u).isCutoffPost()) {
 				u = ((Condition) u).getCorrespondingCondition();
 				queue.offer(u);
 			} else {
-				if (this.cpuReachMap.get(e2).get(
-						u)) {
+				if (this.cpuReachMap.get(e2).get(u)) {
 					lcsSet.add(u);
 					continue;
 				}
@@ -475,16 +473,14 @@ public class LeastCommonPredecessorsAndSuccessors {
 			} else if (u instanceof Condition
 					&& ((Condition) u).getPlace() == sink) {
 				hasSinkSucc2 = true;
-				if (this.cpuReachMap.get(e1).get(
-						u)) {
+				if (this.cpuReachMap.get(e1).get(u)) {
 					lcsSet.add(u);
 				}
 			} else if (u instanceof Condition && ((Condition) u).isCutoffPost()) {
 				u = ((Condition) u).getCorrespondingCondition();
 				queue.offer(u);
 			} else {
-				if (this.cpuReachMap.get(e1).get(
-						u)) {
+				if (this.cpuReachMap.get(e1).get(u)) {
 					lcsSet.add(u);
 					continue;
 				}
@@ -540,13 +536,11 @@ public class LeastCommonPredecessorsAndSuccessors {
 			boolean filter = false;
 			while (it.hasNext()) {
 				IBPNode v = it.next();
-				if (this.cpuReachMap.get(v).get(
-						lcs)) {
+				if (this.cpuReachMap.get(v).get(lcs)) {
 					filter = true;
 					break;
 				}
-				if (this.cpuReachMap.get(lcs).get(
-						v)) {
+				if (this.cpuReachMap.get(lcs).get(v)) {
 					it.remove();
 				}
 			}

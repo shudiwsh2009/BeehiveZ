@@ -92,13 +92,6 @@ public class RefinedOrderingRelationsMatrix {
 				Transition toTransition = alObTransitions.get(j);
 				Set<Event> toEvents = this._cpu.getEvents(toTransition);
 
-				if ((fromTransition.getLabel().equals("b")
-						&& toTransition.getLabel().equals("b"))
-						||
-						(fromTransition.getLabel().equals("d")
-								&& toTransition.getLabel().equals("d"))) {
-					int a = 1;
-				}
 				// if a == b && there is a trace a -> b, then a ->(S) b
 				if (i == j) {
 					boolean selfLoop = false;
@@ -153,10 +146,6 @@ public class RefinedOrderingRelationsMatrix {
 					}
 				}
 
-				if (fromTransition.getLabel().equals("f")
-						&& toTransition.getLabel().equals("c")) {
-					int a = 1;
-				}
 				int backwardCount = 0;
 				boolean hasSkipOrLoopBackwardTrace = false;
 				for (Event a : fromEvents) {
@@ -257,11 +246,15 @@ public class RefinedOrderingRelationsMatrix {
 								// if has a loop
 								// the loop must not contain end
 								Set<IBPNode> visited = new HashSet<IBPNode>();
-//								visited.add(end);
-								if(end instanceof Event) {
-									visited.addAll(this._cpu.getEvents(((Event) end).getTransition()));
-								} else if(end instanceof Condition) {
-									visited.addAll(this._cpu.getConditions(((Condition) end).getPlace()));
+								// visited.add(end);
+								if (end instanceof Event) {
+									visited.addAll(this._cpu
+											.getEvents(((Event) end)
+													.getTransition()));
+								} else if (end instanceof Condition) {
+									visited.addAll(this._cpu
+											.getConditions(((Condition) end)
+													.getPlace()));
 								}
 								if (findTrace(succ, start, visited) != null) {
 									return true;
@@ -303,11 +296,15 @@ public class RefinedOrderingRelationsMatrix {
 								// if has a loop
 								// the loop must not contain start
 								Set<IBPNode> visited = new HashSet<IBPNode>();
-//								visited.add(start);
-								if(start instanceof Event) {
-									visited.addAll(this._cpu.getEvents(((Event) start).getTransition()));
-								} else if(start instanceof Condition) {
-									visited.addAll(this._cpu.getConditions(((Condition) start).getPlace()));
+								// visited.add(start);
+								if (start instanceof Event) {
+									visited.addAll(this._cpu
+											.getEvents(((Event) start)
+													.getTransition()));
+								} else if (start instanceof Condition) {
+									visited.addAll(this._cpu
+											.getConditions(((Condition) start)
+													.getPlace()));
 								}
 								if (findTrace(end, pred, visited) != null) {
 									return true;
@@ -338,10 +335,6 @@ public class RefinedOrderingRelationsMatrix {
 				Transition toTransition = alObTransitions.get(j);
 				Set<Event> toEvents = this._cpu.getEvents(toTransition);
 
-				if (fromTransition.getLabel().equals("b")
-						&& toTransition.getLabel().equals("d")) {
-					int a = 1;
-				}
 				// a may have some shadow events
 				// which need to be checked one by one
 				// when determining the relation of a||b
@@ -639,7 +632,7 @@ public class RefinedOrderingRelationsMatrix {
 	 */
 	private List<IBPNode> findTrace(IBPNode start, IBPNode end,
 			Set<IBPNode> visited) {
-		if(visited.contains(start) || visited.contains(end)) {
+		if (visited.contains(start) || visited.contains(end)) {
 			return null;
 		}
 		List<IBPNode> trace = new ArrayList<IBPNode>();

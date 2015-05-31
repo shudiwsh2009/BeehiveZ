@@ -55,13 +55,15 @@ public class RormSimilarity extends PetriNetSimilarity {
 					++followInter;
 				}
 				if (ecfm1.getInverseCausalMatrix()[tName1.indexOf(row)][tName1
-						.indexOf(col)].equals(ecfm2.getInverseCausalMatrix()[tName2
-						.indexOf(row)][tName2.indexOf(col)])) {
+						.indexOf(col)]
+						.equals(ecfm2.getInverseCausalMatrix()[tName2
+								.indexOf(row)][tName2.indexOf(col)])) {
 					++precedeInter;
 				}
 				if (ecfm1.getConcurrentMatrix()[tName1.indexOf(row)][tName1
-						.indexOf(col)].equals(ecfm2.getConcurrentMatrix()[tName2
-						.indexOf(row)][tName2.indexOf(col)])) {
+						.indexOf(col)]
+						.equals(ecfm2.getConcurrentMatrix()[tName2.indexOf(row)][tName2
+								.indexOf(col)])) {
 					++parallelInter;
 				}
 			}
@@ -109,19 +111,21 @@ public class RormSimilarity extends PetriNetSimilarity {
 		// String filePath = "/Users/shudi/Desktop/M15.pnml";
 		PnmlImport pnmlImport = new PnmlImport();
 
-		String filePath = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\multi_relation.pnml";
+		String filePath = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\DMKD07_N7.pnml";
 		PetriNet pn = pnmlImport.read(new FileInputStream(new File(filePath)));
 		RefinedOrderingRelationsMatrix rorm = new RefinedOrderingRelationsMatrix(
 				(PetriNet) pn.clone());
 		rorm.printMatrix();
 
-//		String filepath1 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\parallel_inv_1_a.pnml";
-//		String filepath2 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\parallel_inv_1_b.pnml";
-//		PetriNet pn1 = pnmlImport
-//				.read(new FileInputStream(new File(filepath1)));
-//		PetriNet pn2 = pnmlImport
-//				.read(new FileInputStream(new File(filepath2)));
-//		PetriNetSimilarity sim = new RormSimilarity();
-//		System.out.println(sim.similarity(pn1, pn2));
+		// String filepath1 =
+		// "C:\\Users\\Shudi\\Desktop\\rorm\\test\\parallel_inv_1_a.pnml";
+		// String filepath2 =
+		// "C:\\Users\\Shudi\\Desktop\\rorm\\test\\parallel_inv_1_b.pnml";
+		// PetriNet pn1 = pnmlImport
+		// .read(new FileInputStream(new File(filepath1)));
+		// PetriNet pn2 = pnmlImport
+		// .read(new FileInputStream(new File(filepath2)));
+		// PetriNetSimilarity sim = new RormSimilarity();
+		// System.out.println(sim.similarity(pn1, pn2));
 	}
 }
