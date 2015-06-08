@@ -12,7 +12,7 @@ import org.processmining.framework.models.petrinet.PetriNet;
 import org.processmining.framework.plugin.ProvidedObject;
 import org.processmining.importing.pnml.PnmlImport;
 
-import cn.edu.thss.iise.beehivez.server.metric.rorm.conversion.JbptConversion;
+import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.JbptConversion;
 
 public class UnfoldingGeneratorTest {
 

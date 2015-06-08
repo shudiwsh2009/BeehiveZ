@@ -19,8 +19,8 @@ import org.jbpt.petri.unfolding.Event;
 import org.jbpt.petri.unfolding.IBPNode;
 import org.processmining.framework.models.petrinet.PetriNet;
 
-import cn.edu.thss.iise.beehivez.server.metric.rorm.conversion.JbptConversion;
-import cn.edu.thss.iise.beehivez.server.metric.rorm.lc.LeastCommonPredecessorsAndSuccessors;
+import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.JbptConversion;
+import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.LeastCommonPredecessorsAndSuccessors;
 
 @SuppressWarnings("rawtypes")
 public class RefinedOrderingRelationsMatrix {

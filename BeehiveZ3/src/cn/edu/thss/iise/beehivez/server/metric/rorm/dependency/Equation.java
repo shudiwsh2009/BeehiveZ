@@ -1,4 +1,4 @@
-package cn.edu.thss.iise.beehivez.server.metric.rorm.equation;
+package cn.edu.thss.iise.beehivez.server.metric.rorm.dependency;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

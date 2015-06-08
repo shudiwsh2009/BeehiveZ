@@ -12,7 +12,7 @@ import org.processmining.framework.models.petrinet.Place;
 import org.processmining.framework.models.petrinet.Token;
 import org.processmining.importing.pnml.PnmlImport;
 
-import cn.edu.thss.iise.beehivez.server.metric.rorm.conversion.JbptConversion;
+import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.JbptConversion;
 import cn.edu.thss.iise.beehivez.server.metric.rorm.old.unfolding.CompleteFinitePrefix;
 import cn.edu.thss.iise.beehivez.server.metric.rorm.old.unfolding.CompleteFinitePrefixBuilder;
 
