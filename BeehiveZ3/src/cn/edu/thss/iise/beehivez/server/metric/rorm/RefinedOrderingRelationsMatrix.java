@@ -21,6 +21,7 @@ import org.processmining.framework.models.petrinet.PetriNet;
 
 import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.JbptConversion;
 import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.LeastCommonPredecessorsAndSuccessors;
+import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.SequentialDirectAdjacency;
 
 @SuppressWarnings("rawtypes")
 public class RefinedOrderingRelationsMatrix {
@@ -66,6 +67,7 @@ public class RefinedOrderingRelationsMatrix {
 		}
 		generateCausalAndInverseCausalMatrix();
 		generateConcurrentMatrix();
+		SequentialDirectAdjacency sda = new SequentialDirectAdjacency(this._cpu, this._lc);
 	}
 
 	private void generateCausalAndInverseCausalMatrix() {
