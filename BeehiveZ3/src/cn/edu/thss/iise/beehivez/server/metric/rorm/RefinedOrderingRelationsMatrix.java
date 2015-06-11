@@ -21,6 +21,7 @@ import org.processmining.framework.models.petrinet.PetriNet;
 
 import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.JbptConversion;
 import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.LeastCommonPredecessorsAndSuccessors;
+import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.SequentialDirectAdjacency;
 
 @SuppressWarnings("rawtypes")
 public class RefinedOrderingRelationsMatrix {
@@ -37,6 +38,7 @@ public class RefinedOrderingRelationsMatrix {
 
 	private Set<Condition> _loopJoinConditions = new HashSet<Condition>();
 	private LeastCommonPredecessorsAndSuccessors _lc;
+	private SequentialDirectAdjacency _sda;
 
 	public RefinedOrderingRelationsMatrix(PetriNet pn) {
 		this(JbptConversion.convert(pn));
@@ -66,13 +68,14 @@ public class RefinedOrderingRelationsMatrix {
 		}
 		generateCausalAndInverseCausalMatrix();
 		generateConcurrentMatrix();
+		generateSequentialDirectAdjacency();
 	}
 
 	private void generateCausalAndInverseCausalMatrix() {
 		List<Transition> alObTransitions = new ArrayList<Transition>(
 				this._sys.getObservableTransitions());
 		Collections.sort(alObTransitions,
-				(t1, t2) -> t1.getLabel().compareTo(t2.getLabel()));
+				(t1, t2) -> t1.getName().compareTo(t2.getName()));
 		Place sinkPlace = this._sys.getSinkPlaces().iterator().next();
 		Condition sinkCondition = this._cpu.getConditions(sinkPlace).iterator()
 				.next();
@@ -99,22 +102,22 @@ public class RefinedOrderingRelationsMatrix {
 						for (Event b : toEvents) {
 							if (findTrace(a, b, new HashSet<IBPNode>()) != null) {
 								this.causalMatrix[this.tName
-										.indexOf(fromTransition.getLabel())][this.tName
-										.indexOf(toTransition.getLabel())].relation = Relation.SOMETIMES;
+										.indexOf(fromTransition.getName())][this.tName
+										.indexOf(toTransition.getName())].relation = Relation.SOMETIMES;
 								this.inverseCausalMatrix[this.tName
-										.indexOf(fromTransition.getLabel())][this.tName
-										.indexOf(toTransition.getLabel())].relation = Relation.SOMETIMES;
+										.indexOf(fromTransition.getName())][this.tName
+										.indexOf(toTransition.getName())].relation = Relation.SOMETIMES;
 								selfLoop = true;
 							}
 						}
 					}
 					if (!selfLoop) {
 						this.causalMatrix[this.tName.indexOf(fromTransition
-								.getLabel())][this.tName.indexOf(toTransition
-								.getLabel())].relation = Relation.NEVER;
+								.getName())][this.tName.indexOf(toTransition
+								.getName())].relation = Relation.NEVER;
 						this.inverseCausalMatrix[this.tName
-								.indexOf(fromTransition.getLabel())][this.tName
-								.indexOf(toTransition.getLabel())].relation = Relation.NEVER;
+								.indexOf(fromTransition.getName())][this.tName
+								.indexOf(toTransition.getName())].relation = Relation.NEVER;
 					}
 					continue;
 				}
@@ -177,40 +180,40 @@ public class RefinedOrderingRelationsMatrix {
 				// skiped or looped, a->(ALWAYS)->b
 				if (forwardCount == 0) {
 					this.causalMatrix[this.tName.indexOf(fromTransition
-							.getLabel())][this.tName.indexOf(toTransition
-							.getLabel())].relation = Relation.NEVER;
+							.getName())][this.tName.indexOf(toTransition
+							.getName())].relation = Relation.NEVER;
 				} else if (forwardCount < fromEvents.size()) {
 
 					this.causalMatrix[this.tName.indexOf(fromTransition
-							.getLabel())][this.tName.indexOf(toTransition
-							.getLabel())].relation = Relation.SOMETIMES;
+							.getName())][this.tName.indexOf(toTransition
+							.getName())].relation = Relation.SOMETIMES;
 				} else if (hasSkipOrLoopForwardTrace) {
 					this.causalMatrix[this.tName.indexOf(fromTransition
-							.getLabel())][this.tName.indexOf(toTransition
-							.getLabel())].relation = Relation.SOMETIMES;
+							.getName())][this.tName.indexOf(toTransition
+							.getName())].relation = Relation.SOMETIMES;
 				} else {
 					this.causalMatrix[this.tName.indexOf(fromTransition
-							.getLabel())][this.tName.indexOf(toTransition
-							.getLabel())].relation = Relation.ALWAYS;
+							.getName())][this.tName.indexOf(toTransition
+							.getName())].relation = Relation.ALWAYS;
 				}
 
 				// analogously, a <- b has four cases
 				if (backwardCount == 0) {
 					this.inverseCausalMatrix[this.tName.indexOf(fromTransition
-							.getLabel())][this.tName.indexOf(toTransition
-							.getLabel())].relation = Relation.NEVER;
+							.getName())][this.tName.indexOf(toTransition
+							.getName())].relation = Relation.NEVER;
 				} else if (backwardCount < fromEvents.size()) {
 					this.inverseCausalMatrix[this.tName.indexOf(fromTransition
-							.getLabel())][this.tName.indexOf(toTransition
-							.getLabel())].relation = Relation.SOMETIMES;
+							.getName())][this.tName.indexOf(toTransition
+							.getName())].relation = Relation.SOMETIMES;
 				} else if (hasSkipOrLoopBackwardTrace) {
 					this.inverseCausalMatrix[this.tName.indexOf(fromTransition
-							.getLabel())][this.tName.indexOf(toTransition
-							.getLabel())].relation = Relation.SOMETIMES;
+							.getName())][this.tName.indexOf(toTransition
+							.getName())].relation = Relation.SOMETIMES;
 				} else {
 					this.inverseCausalMatrix[this.tName.indexOf(fromTransition
-							.getLabel())][this.tName.indexOf(toTransition
-							.getLabel())].relation = Relation.ALWAYS;
+							.getName())][this.tName.indexOf(toTransition
+							.getName())].relation = Relation.ALWAYS;
 				}
 			}
 		}
@@ -327,7 +330,7 @@ public class RefinedOrderingRelationsMatrix {
 		List<Transition> alObTransitions = new ArrayList<Transition>(
 				this._sys.getObservableTransitions());
 		Collections.sort(alObTransitions,
-				(t1, t2) -> t1.getLabel().compareTo(t2.getLabel()));
+				(t1, t2) -> t1.getName().compareTo(t2.getName()));
 		for (int i = 0; i < alObTransitions.size(); ++i) {
 			Transition fromTransition = alObTransitions.get(i);
 			Set<Event> fromEvents = this._cpu.getEvents(fromTransition);
@@ -406,38 +409,38 @@ public class RefinedOrderingRelationsMatrix {
 
 				if (aConcurrentIn.size() == 0) {
 					this.concurrentMatrix[this.tName.indexOf(fromTransition
-							.getLabel())][this.tName.indexOf(toTransition
-							.getLabel())].relation = Relation.NEVER;
+							.getName())][this.tName.indexOf(toTransition
+							.getName())].relation = Relation.NEVER;
 				} else if (aConcurrentIn.size() < fromEvents.size()) {
 					this.concurrentMatrix[this.tName.indexOf(fromTransition
-							.getLabel())][this.tName.indexOf(toTransition
-							.getLabel())].relation = Relation.SOMETIMES;
+							.getName())][this.tName.indexOf(toTransition
+							.getName())].relation = Relation.SOMETIMES;
 				} else if (aHasSometimesConcurrent) {
 					this.concurrentMatrix[this.tName.indexOf(fromTransition
-							.getLabel())][this.tName.indexOf(toTransition
-							.getLabel())].relation = Relation.SOMETIMES;
+							.getName())][this.tName.indexOf(toTransition
+							.getName())].relation = Relation.SOMETIMES;
 				} else {
 					this.concurrentMatrix[this.tName.indexOf(fromTransition
-							.getLabel())][this.tName.indexOf(toTransition
-							.getLabel())].relation = Relation.ALWAYS;
+							.getName())][this.tName.indexOf(toTransition
+							.getName())].relation = Relation.ALWAYS;
 				}
 
 				if (bConcurrentIn.size() == 0) {
 					this.concurrentMatrix[this.tName.indexOf(toTransition
-							.getLabel())][this.tName.indexOf(fromTransition
-							.getLabel())].relation = Relation.NEVER;
+							.getName())][this.tName.indexOf(fromTransition
+							.getName())].relation = Relation.NEVER;
 				} else if (bConcurrentIn.size() < toEvents.size()) {
 					this.concurrentMatrix[this.tName.indexOf(toTransition
-							.getLabel())][this.tName.indexOf(fromTransition
-							.getLabel())].relation = Relation.SOMETIMES;
+							.getName())][this.tName.indexOf(fromTransition
+							.getName())].relation = Relation.SOMETIMES;
 				} else if (bHasSometimesConcurrent) {
 					this.concurrentMatrix[this.tName.indexOf(toTransition
-							.getLabel())][this.tName.indexOf(fromTransition
-							.getLabel())].relation = Relation.SOMETIMES;
+							.getName())][this.tName.indexOf(fromTransition
+							.getName())].relation = Relation.SOMETIMES;
 				} else {
 					this.concurrentMatrix[this.tName.indexOf(toTransition
-							.getLabel())][this.tName.indexOf(fromTransition
-							.getLabel())].relation = Relation.ALWAYS;
+							.getName())][this.tName.indexOf(fromTransition
+							.getName())].relation = Relation.ALWAYS;
 				}
 			}
 		}
@@ -621,6 +624,20 @@ public class RefinedOrderingRelationsMatrix {
 		return new boolean[] { aHasSometimesConcurrent, bHasSometimesConcurrent };
 	}
 
+	private void generateSequentialDirectAdjacency() {
+		this._sda = new SequentialDirectAdjacency(this._cpu, this._lc);
+		for (Map.Entry<Transition, Set<Transition>> entry : this._sda
+				.getSdaRelations().entrySet()) {
+			Transition key = entry.getKey();
+			for (Transition value : entry.getValue()) {
+				this.causalMatrix[this.tName.indexOf(key.getName())][this.tName
+						.indexOf(value.getName())].adjacency = true;
+				this.inverseCausalMatrix[this.tName.indexOf(key.getName())][this.tName
+						.indexOf(value.getName())].adjacency = true;
+			}
+		}
+	}
+
 	/**
 	 * find a trace from start to end return a trace without a loop xor-join if
 	 * possible
@@ -744,7 +761,7 @@ public class RefinedOrderingRelationsMatrix {
 		Set<Transition> alTransitions = this._sys.getTransitions();
 		for (Transition t : alTransitions) {
 			if (t.isObservable()) {
-				this.tName.add(t.getLabel());
+				this.tName.add(t.getName());
 			}
 		}
 		Collections.sort(tName);
@@ -782,6 +799,9 @@ public class RefinedOrderingRelationsMatrix {
 			}
 			System.out.println();
 		}
+		
+		System.out.println("Sequential Direct Adjacency");
+		System.out.println(this._sda.toString());
 	}
 
 	public RefinedOrderingRelation[][] getCausalMatrix() {

@@ -11,14 +11,16 @@ import org.jbpt.petri.unfolding.CompletePrefixUnfolding;
 import org.jbpt.petri.unfolding.Condition;
 import org.jbpt.petri.unfolding.Event;
 
-public abstract class Marking extends HashMap<Condition, Integer> {
+public class Marking extends HashMap<Condition, Integer> {
 
-	private static final long serialVersionUID = -2144274745926614966L;
+	private static final long serialVersionUID = 4819455305876082860L;
 
 	// associated net
 	private CompletePrefixUnfolding _cpu = null;
-	private Event preEvent = null;
-	private Set<Event> postEvents = new HashSet<Event>();
+	private Event preVisEvent = null;
+	private Event preInvEvent = null;
+	private Set<Event> postEnabledEvents = new HashSet<Event>();
+	private Set<Event> postDisabledEvents = new HashSet<Event>();
 
 	public Marking() {
 	}
@@ -82,6 +84,8 @@ public abstract class Marking extends HashMap<Condition, Integer> {
 				this.put(c, tokens + 1);
 			}
 		}
+		this._cpu.getEvents().stream().filter(this::isEnabled)
+				.forEach(this.postEnabledEvents::add);
 	}
 
 	public Integer remove(Condition condition) {
@@ -119,7 +123,7 @@ public abstract class Marking extends HashMap<Condition, Integer> {
 	public Set<Map.Entry<Condition, Integer>> entrySet() {
 		return super.entrySet();
 	}
-	
+
 	@Override
 	public boolean equals(Object o) {
 		if (o == null) {
@@ -149,11 +153,11 @@ public abstract class Marking extends HashMap<Condition, Integer> {
 	@Override
 	public int hashCode() {
 		int result = 0;
-
 		result -= this._cpu.hashCode();
-
-		for (Condition c : this._cpu.getConditions())
+		for (Condition c : this._cpu.getConditions()) {
 			result += 17 * c.hashCode() * this.get(c);
+		}
+		result += (preVisEvent == null) ? 0 : 19 * preVisEvent.hashCode();
 
 		return result;
 	}
@@ -165,8 +169,10 @@ public abstract class Marking extends HashMap<Condition, Integer> {
 			m.setCompletePrefixUnfolding(cpu);
 			return m;
 		} catch (IllegalAccessException exception) {
+			exception.printStackTrace();
 			return m;
 		} catch (InstantiationException exception) {
+			exception.printStackTrace();
 			return m;
 		}
 	}
@@ -189,15 +195,30 @@ public abstract class Marking extends HashMap<Condition, Integer> {
 		return true;
 	}
 
+	public Set<Event> getEnabledEvents() {
+		Set<Event> enabledEvents = new HashSet<Event>();
+		this._cpu.getEvents().stream().filter(this::isEnabled).forEach(enabledEvents::add);
+		return enabledEvents;
+	}
+
+	/**
+	 * Fire e and update preEvent & postEvents
+	 * @param e
+	 * @return
+	 */
 	public boolean fire(Event e) {
 		if (!this.isEnabled(e)) {
 			return false;
 		}
 
-		this.preEvent = e;
-		for (Condition c : e.getPreConditions()) {
-			this.put(c, this.get(c) - 1);
+		if(e.getTransition().isSilent()) {
+			this.preInvEvent = e;
+		} else {
+			this.preInvEvent = null;
+			this.preVisEvent = e;
 		}
+		e.getPreConditions().stream()
+				.forEach(c -> this.put(c, this.get(c) - 1));
 		Set<Event> newEvents = new HashSet<Event>();
 		for (Condition c : e.getPostConditions()) {
 			if (c.isCutoffPost()) {
@@ -206,22 +227,67 @@ public abstract class Marking extends HashMap<Condition, Integer> {
 			this.put(c, this.get(c) + 1);
 			newEvents.addAll(c.getPostE());
 		}
-		this.postEvents.clear();
-		for(Event newE : newEvents) {
-			if(this.isEnabled(newE)) {
-				this.postEvents.add(newE);
+		this.postEnabledEvents.clear();
+		this.postDisabledEvents.clear();
+		for(Event newEvent : newEvents) {
+			if(this.isEnabled(newEvent)) {
+				this.postEnabledEvents.add(newEvent);
+			} else {
+				this.postDisabledEvents.add(newEvent);
 			}
 		}
 
 		return true;
 	}
 	
+	/**
+	 * Only fire e without updating preEvent & postEvents
+	 * @param e
+	 * @return
+	 */
+	public boolean onlyFire(Event e) {
+		if (!this.isEnabled(e)) {
+			return false;
+		}
+		e.getPreConditions().stream()
+			.forEach(c -> this.put(c, this.get(c) - 1));
+		for (Condition c : e.getPostConditions()) {
+			if (c.isCutoffPost()) {
+				c = c.getCorrespondingCondition();
+			}
+			this.put(c, this.get(c) + 1);
+		}
+		return true;
+	}
+
 	public Marking clone() {
 		Marking cloneMarking = (Marking) super.clone();
 		cloneMarking._cpu = this._cpu;
-		cloneMarking.preEvent = this.preEvent;
-		cloneMarking.postEvents = new HashSet<Event>(this.postEvents);
+		cloneMarking.preVisEvent = this.preVisEvent;
+		cloneMarking.preInvEvent = this.preInvEvent;
+		cloneMarking.postEnabledEvents = new HashSet<Event>(this.postEnabledEvents);
+		cloneMarking.postDisabledEvents = new HashSet<Event>(this.postDisabledEvents);
 		return cloneMarking;
+	}
+
+	public Event getPreVisEvent() {
+		return preVisEvent;
+	}
+	
+	public Event getPreInvEvent() {
+		return preInvEvent;
+	}
+	
+	public Event getPreEvent() {
+		return preInvEvent != null ? preInvEvent : preVisEvent;
+	}
+
+	public Set<Event> getPostEnabledEvents() {
+		return postEnabledEvents;
+	}
+	
+	public Set<Event> getPostDisabledEvents() {
+		return postDisabledEvents;
 	}
 
 }

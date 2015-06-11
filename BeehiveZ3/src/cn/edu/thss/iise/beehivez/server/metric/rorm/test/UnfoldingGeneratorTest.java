@@ -17,11 +17,11 @@ import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.JbptConversion;
 public class UnfoldingGeneratorTest {
 
 	public static void jbptTest() throws Exception {
-		String filePath1 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\multi_relation.pnml";
-		String filePath2 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\multi_relation.png";
+		String filePath1 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\non_free_choice.pnml";
+		String filePath2 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\non_free_choice.png";
 		// String filePath3 =
 		// "C:\\Users\\Shudi\\Desktop\\rorm\\test\\multi_relation_1_cfp.pnml";
-		String filePath4 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\multi_relation_cfp.png";
+		String filePath4 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\non_free_choice_cfp.png";
 
 		// String filePath1 =
 		// "/Users/shudi/Desktop/parallel_A_with_outer_loop.pnml";
