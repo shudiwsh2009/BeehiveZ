@@ -1,11 +1,8 @@
 package cn.edu.thss.iise.beehivez.server.metric.rorm.dependency;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 
 import org.jbpt.petri.NetSystem;
@@ -14,7 +11,6 @@ import org.jbpt.petri.unfolding.CompletePrefixUnfolding;
 import org.jbpt.petri.unfolding.Condition;
 import org.jbpt.petri.unfolding.Event;
 import org.jbpt.petri.unfolding.IBPNode;
-import org.semanticweb.kaon2.tt;
 
 public class SequentialDirectAdjacency {
 
@@ -48,7 +44,7 @@ public class SequentialDirectAdjacency {
 			return;
 		}
 		visitedMarkings.add(m);
-		if (m.getPreEvent() == null) {
+		if (m.getPreVisEvent() == null) {
 			// initialMarking
 			for (Event postEvent : m.getPostEnabledEvents()) {
 				Marking newMarking = m.clone();
@@ -60,9 +56,10 @@ public class SequentialDirectAdjacency {
 			for (Event postEvent : m.getPostEnabledEvents()) {
 				if (!postEvent.getTransition().isSilent()) {
 					// if postEnabledEvent is visible, add <pre, post> to sda
-					sdaRelations.putIfAbsent(m.getPreEvent().getTransition(),
+					sdaRelations.putIfAbsent(
+							m.getPreVisEvent().getTransition(),
 							new HashSet<Transition>());
-					sdaRelations.get(m.getPreEvent().getTransition()).add(
+					sdaRelations.get(m.getPreVisEvent().getTransition()).add(
 							postEvent.getTransition());
 				}
 				// fire it and dfs
@@ -98,24 +95,18 @@ public class SequentialDirectAdjacency {
 								if (!postEvent.getTransition().isSilent()) {
 									// if postDisabledEvent is visible, add
 									// <pre, post> to sda
-									// fire it and dfs
 									sdaRelations.putIfAbsent(newMarking
-											.getPreEvent().getTransition(),
+											.getPreVisEvent().getTransition(),
 											new HashSet<Transition>());
 									sdaRelations.get(
-											newMarking.getPreEvent()
+											newMarking.getPreVisEvent()
 													.getTransition()).add(
 											postEvent.getTransition());
-									Marking postMarking = newMarking.clone();
-									postMarking.fire(postEvent);
-									dfsMarking(postMarking);
-								} else {
-									// if postDisabledEvent is invisible
-									// TODO
-									Marking postMarking = newMarking.clone();
-									postMarking.fire(postEvent);
-									dfsMarking(postMarking);
 								}
+								// fire it and dfs
+								Marking postMarking = newMarking.clone();
+								postMarking.fire(postEvent);
+								dfsMarking(postMarking);
 							}
 						}
 						canFire = true;
@@ -157,6 +148,10 @@ public class SequentialDirectAdjacency {
 							sb.append("\r\n");
 						});
 		return sb.toString();
+	}
+
+	public Map<Transition, Set<Transition>> getSdaRelations() {
+		return sdaRelations;
 	}
 
 }

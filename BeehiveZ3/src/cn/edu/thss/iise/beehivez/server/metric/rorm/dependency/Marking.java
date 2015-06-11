@@ -17,7 +17,8 @@ public class Marking extends HashMap<Condition, Integer> {
 
 	// associated net
 	private CompletePrefixUnfolding _cpu = null;
-	private Event preEvent = null;
+	private Event preVisEvent = null;
+	private Event preInvEvent = null;
 	private Set<Event> postEnabledEvents = new HashSet<Event>();
 	private Set<Event> postDisabledEvents = new HashSet<Event>();
 
@@ -156,7 +157,7 @@ public class Marking extends HashMap<Condition, Integer> {
 		for (Condition c : this._cpu.getConditions()) {
 			result += 17 * c.hashCode() * this.get(c);
 		}
-		result += (preEvent == null) ? 0 : 19 * preEvent.hashCode();
+		result += (preVisEvent == null) ? 0 : 19 * preVisEvent.hashCode();
 
 		return result;
 	}
@@ -210,8 +211,11 @@ public class Marking extends HashMap<Condition, Integer> {
 			return false;
 		}
 
-		if(!e.getTransition().isSilent()) {
-			this.preEvent = e;
+		if(e.getTransition().isSilent()) {
+			this.preInvEvent = e;
+		} else {
+			this.preInvEvent = null;
+			this.preVisEvent = e;
 		}
 		e.getPreConditions().stream()
 				.forEach(c -> this.put(c, this.get(c) - 1));
@@ -259,14 +263,23 @@ public class Marking extends HashMap<Condition, Integer> {
 	public Marking clone() {
 		Marking cloneMarking = (Marking) super.clone();
 		cloneMarking._cpu = this._cpu;
-		cloneMarking.preEvent = this.preEvent;
+		cloneMarking.preVisEvent = this.preVisEvent;
+		cloneMarking.preInvEvent = this.preInvEvent;
 		cloneMarking.postEnabledEvents = new HashSet<Event>(this.postEnabledEvents);
 		cloneMarking.postDisabledEvents = new HashSet<Event>(this.postDisabledEvents);
 		return cloneMarking;
 	}
 
+	public Event getPreVisEvent() {
+		return preVisEvent;
+	}
+	
+	public Event getPreInvEvent() {
+		return preInvEvent;
+	}
+	
 	public Event getPreEvent() {
-		return preEvent;
+		return preInvEvent != null ? preInvEvent : preVisEvent;
 	}
 
 	public Set<Event> getPostEnabledEvents() {
