@@ -38,7 +38,6 @@ public class SequentialDirectAdjacency {
 		return;
 	}
 
-	@SuppressWarnings("rawtypes")
 	private void dfsMarking(Marking m) {
 		if (visitedMarkings.contains(m)) {
 			return;
@@ -70,52 +69,113 @@ public class SequentialDirectAdjacency {
 			// secondly, fire all the enabled events which is concurrent with
 			// preEvent, then check postDisabledEvents
 			Marking newMarking = m.clone();
-			boolean canFire = true;
 			Set<Integer> visited = new HashSet<Integer>();
-			while (canFire) {
-				canFire = false;
-				if (visited.contains(newMarking.hashCode())) {
-					break;
-				}
-				visited.add(newMarking.hashCode());
-				for (Event e : newMarking.getEnabledEvents()) {
+			dfsPostDisabledEvents(newMarking, visited);
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	private void dfsPostDisabledEvents(Marking m, Set<Integer> visited) {
+		// fire all the enabled events which is concurrent with preEvent,
+		// check postDisabledEvents in every fire
+		boolean canFire = true;
+		// 1. try to fire all the enabled events which are not in a non-free
+		// choice structure
+		while (canFire) {
+			canFire = false;
+			if (visited.contains(m.hashCode())) {
+				break;
+			}
+			visited.add(m.hashCode());
+			for (Event e : m.getEnabledEvents()) {
+				if (this.checkEventInNFC(e)) {
 					Set<IBPNode> lcpSet = this._lc.getLcpCpuMap().get(e)
-							.get(newMarking.getPreEvent());
+							.get(m.getPreEvent());
 					boolean isConcurrent = !lcpSet.stream()
 							.anyMatch(
 									lcp -> (lcp instanceof Condition
-											|| lcp == e || lcp == newMarking
+											|| lcp == e || lcp == m
 											.getPreEvent()));
 					if (isConcurrent) {
-						newMarking.onlyFire(e);
+						m.onlyFire(e);
 						// check postDisabledEvent every time
-						for (Event postEvent : newMarking
-								.getPostDisabledEvents()) {
-							if (newMarking.isEnabled(postEvent)) {
+						for (Event postEvent : m.getPostDisabledEvents()) {
+							if (m.isEnabled(postEvent)) {
 								if (!postEvent.getTransition().isSilent()) {
 									// if postDisabledEvent is visible, add
 									// <pre, post> to sda
-									sdaRelations.putIfAbsent(newMarking
-											.getPreVisEvent().getTransition(),
+									sdaRelations.putIfAbsent(m.getPreVisEvent()
+											.getTransition(),
 											new HashSet<Transition>());
 									sdaRelations.get(
-											newMarking.getPreVisEvent()
-													.getTransition()).add(
-											postEvent.getTransition());
+											m.getPreVisEvent().getTransition())
+											.add(postEvent.getTransition());
 								}
 								// fire it and dfs
-								Marking postMarking = newMarking.clone();
+								Marking postMarking = m.clone();
 								postMarking.fire(postEvent);
 								dfsMarking(postMarking);
 							}
 						}
 						canFire = true;
-						break;
 					}
 				}
 			}
-
 		}
+		// 2. if there is no such events, traverse to fire other enabled events
+		for (Event e : m.getEnabledEvents()) {
+			Set<IBPNode> lcpSet = this._lc.getLcpCpuMap().get(e)
+					.get(m.getPreEvent());
+			boolean isConcurrent = !lcpSet.stream().anyMatch(
+					lcp -> (lcp instanceof Condition || lcp == e || lcp == m
+							.getPreEvent()));
+			if (isConcurrent) {
+				Marking copyMarking = m.clone();
+				copyMarking.onlyFire(e);
+				// check postDisabledEvent every time
+				for (Event postEvent : copyMarking.getPostDisabledEvents()) {
+					if (copyMarking.isEnabled(postEvent)) {
+						if (!postEvent.getTransition().isSilent()) {
+							// if postDisabledEvent is visible, add <pre, post>
+							// to sda
+							sdaRelations.putIfAbsent(copyMarking
+									.getPreVisEvent().getTransition(),
+									new HashSet<Transition>());
+							sdaRelations.get(
+									copyMarking.getPreVisEvent()
+											.getTransition()).add(
+									postEvent.getTransition());
+						}
+						// fire it and dfs
+						Marking postMarking = copyMarking.clone();
+						postMarking.fire(postEvent);
+						dfsMarking(postMarking);
+					}
+				}
+				dfsPostDisabledEvents(copyMarking, visited);
+			}
+		}
+	}
+
+	/**
+	 * check if a event is in a non-free choice structure
+	 * 
+	 * @param e
+	 * @return
+	 */
+	private boolean checkEventInNFC(Event e) {
+		Set<Condition> preConditions = e.getPreConditions();
+		for (Condition c : preConditions) {
+			Set<Event> postEvents = c.getPostE();
+			for (Event pe : postEvents) {
+				if (pe == e
+						|| e.getPreConditions().equals(pe.getPreConditions())) {
+					continue;
+				}
+				return false;
+			}
+		}
+		return true;
 	}
 
 	private Marking getInitialMarking() {
