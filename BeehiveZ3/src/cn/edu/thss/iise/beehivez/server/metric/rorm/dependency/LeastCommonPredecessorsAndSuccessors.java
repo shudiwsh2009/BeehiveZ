@@ -83,6 +83,10 @@ public class LeastCommonPredecessorsAndSuccessors {
 			Event e1 = events.get(i);
 			for (int j = i + 1; j < events.size(); ++j) {
 				Event e2 = events.get(j);
+//				if(e1.getTransition().getName().equals("T2")
+//						&& e2.getTransition().getName().equals("T5")) {
+//					int a = 1;
+//				}
 				boolean[] skipForwardSys = hasSkipForwardSys(e1, e2);
 				this.forwardSysSkip.get(e1).put(e2, skipForwardSys[0]);
 				this.forwardSysSkip.get(e2).put(e1, skipForwardSys[1]);

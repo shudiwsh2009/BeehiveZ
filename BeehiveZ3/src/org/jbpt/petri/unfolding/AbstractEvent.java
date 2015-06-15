@@ -10,7 +10,7 @@ public abstract class AbstractEvent<BPN extends IBPNode<N>, C extends ICondition
 	extends AbstractBPNode<N>
 	implements IEvent<BPN,C,E,F,N,P,T,M> {
 	
-	static private int count = 0; 
+	static public int count = 0; 
 
 	// required to capture unfolding
 	private T t = null;	// transition that corresponds to event

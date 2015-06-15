@@ -6,6 +6,8 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 
 import org.jbpt.petri.NetSystem;
+import org.jbpt.petri.unfolding.AbstractCondition;
+import org.jbpt.petri.unfolding.AbstractEvent;
 import org.jbpt.petri.unfolding.CompletePrefixUnfolding;
 import org.processmining.exporting.DotPngExport;
 import org.processmining.framework.models.petrinet.PetriNet;
@@ -16,45 +18,46 @@ import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.JbptConversion;
 
 public class UnfoldingGeneratorTest {
 
-	public static void jbptTest() throws Exception {
-		String filePath1 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\non_free_choice.pnml";
-		String filePath2 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\non_free_choice.png";
-		// String filePath3 =
-		// "C:\\Users\\Shudi\\Desktop\\rorm\\test\\multi_relation_1_cfp.pnml";
-		String filePath4 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\non_free_choice_cfp.png";
-
-		// String filePath1 =
-		// "/Users/shudi/Desktop/parallel_A_with_outer_loop.pnml";
-		// String filePath2 =
-		// "/Users/shudi/Desktop/parallel_A_with_outer_loop.png";
-		// String filePath3 =
-		// "/Users/shudi/Desktop/parallel_A_with_outer_loop_cfp.png";
+	public static void singlePng(String filepath) throws Exception {
+		String filePath1 = filepath;
+		int dotIndex = filePath1.lastIndexOf('.');
+		String filePath2 = filePath1.substring(0, dotIndex) + ".png";
+		String filepath3 = filePath1.substring(0, dotIndex) + "_cfp.png";
 
 		PnmlImport pnmlImport = new PnmlImport();
 		PetriNet p1 = pnmlImport.read(new FileInputStream(new File(filePath1)));
 
-		// ori
+		// ori-png
 		ProvidedObject po1 = new ProvidedObject("petrinet", p1);
 		DotPngExport dpe1 = new DotPngExport();
 		OutputStream image1 = new FileOutputStream(filePath2);
 		dpe1.export(po1, image1);
 
 		NetSystem ns = JbptConversion.convert(p1);
+		AbstractCondition.count = 0;
+		AbstractEvent.count = 0;
 		CompletePrefixUnfolding cpu = new CompletePrefixUnfolding(ns);
-
 		PetriNet p2 = JbptConversion.convert(cpu);
 
-		// cfp
-//		 PetriNetUtil.export2pnml(p2, filePath3);
+		// cfp-png
 		ProvidedObject po2 = new ProvidedObject("petrinet", p2);
 		DotPngExport dpe2 = new DotPngExport();
-		OutputStream image2 = new FileOutputStream(filePath4);
+		OutputStream image2 = new FileOutputStream(filepath3);
 		dpe2.export(po2, image2);
+	}
+
+	public static void batchPng(String folderPath) throws Exception {
+		File folder = new File(folderPath);
+		File[] files = folder.listFiles();
+		for (File f : files) {
+			singlePng(f.getAbsolutePath());
+		}
 	}
 
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
-		jbptTest();
+//		singlePng("C:\\Users\\Shudi\\Desktop\\rorm\\test\\DMKD07_M1.pnml");
+		batchPng("C:\\Users\\Shudi\\Desktop\\rorm\\test\\");
 	}
 
 }

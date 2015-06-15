@@ -13,7 +13,7 @@ import org.jbpt.petri.ITransition;
 public abstract class AbstractCondition<BPN extends IBPNode<N>, C extends ICondition<BPN,C,E,F,N,P,T,M>, E extends IEvent<BPN,C,E,F,N,P,T,M>, F extends IFlow<N>, N extends INode, P extends IPlace, T extends ITransition, M extends IMarking<F,N,P,T>> 
 	extends AbstractBPNode<N> 
 	implements ICondition<BPN,C,E,F,N,P,T,M> {
-	private static int count = 0; 	
+	public static int count = 0; 	
 	
 	P s = null;
 	E e = null;
