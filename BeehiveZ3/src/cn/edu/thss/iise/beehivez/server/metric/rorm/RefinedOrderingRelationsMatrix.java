@@ -79,13 +79,14 @@ public class RefinedOrderingRelationsMatrix {
 		Place sinkPlace = this._sys.getSinkPlaces().iterator().next();
 		Condition sinkCondition = this._cpu.getConditions(sinkPlace).iterator()
 				.next();
-		if (sinkCondition.isCutoffPost()) {
+		if (sinkCondition.isCutoffPost() && sinkCondition.getPostE().isEmpty()) {
 			sinkCondition = sinkCondition.getCorrespondingCondition();
 		}
 		Place sourcePlace = this._sys.getSourcePlaces().iterator().next();
 		Condition sourceCondition = this._cpu.getConditions(sourcePlace)
 				.iterator().next();
-		if (sourceCondition.isCutoffPost()) {
+		if (sourceCondition.isCutoffPost()
+				&& sourceCondition.getPostE().isEmpty()) {
 			sourceCondition = sourceCondition.getCorrespondingCondition();
 		}
 		for (int i = 0; i < alObTransitions.size(); ++i) {
@@ -237,7 +238,8 @@ public class RefinedOrderingRelationsMatrix {
 				IBPNode cur = trace.get(i);
 				if (cur instanceof Condition) {
 					Condition curCondition = (Condition) cur;
-					if (curCondition.isCutoffPost()) {
+					if (curCondition.isCutoffPost()
+							&& curCondition.getPostE().isEmpty()) {
 						curCondition = curCondition.getCorrespondingCondition();
 					}
 					if (curCondition.getPostE().size() > 1) {
@@ -287,11 +289,11 @@ public class RefinedOrderingRelationsMatrix {
 					Condition curCondition = (Condition) cur;
 					Set<Condition> mappingConditions = new HashSet<Condition>();
 					if (curCondition.getMappingConditions() != null) {
-						mappingConditions.addAll(curCondition
-								.getMappingConditions());
-					} else {
-						mappingConditions.add(curCondition);
+						curCondition.getMappingConditions().stream()
+								.filter(c -> c.getPostE().isEmpty())
+								.forEach(mappingConditions::add);
 					}
+					mappingConditions.add(curCondition);
 					if (mappingConditions.size() > 1) {
 						for (Condition curC : mappingConditions) {
 							IBPNode pred = curC.getPreEvent();
@@ -465,7 +467,8 @@ public class RefinedOrderingRelationsMatrix {
 			if (cur instanceof Condition) {
 				Condition curCondition = (Condition) cur;
 				// xor-split
-				if (curCondition.isCutoffPost()) {
+				if (curCondition.isCutoffPost()
+						&& curCondition.getPostE().isEmpty()) {
 					curCondition = curCondition.getCorrespondingCondition();
 				}
 				if (curCondition.getPostE().size() > 1) {
@@ -483,11 +486,11 @@ public class RefinedOrderingRelationsMatrix {
 				// xor-join
 				Set<Condition> mappingConditions = new HashSet<Condition>();
 				if (curCondition.getMappingConditions() != null) {
-					mappingConditions.addAll(curCondition
-							.getMappingConditions());
-				} else {
-					mappingConditions.add(curCondition);
+					curCondition.getMappingConditions().stream()
+							.filter(c -> c.getPostE().isEmpty())
+							.forEach(mappingConditions::add);
 				}
+				mappingConditions.add(curCondition);
 				if (mappingConditions.size() > 1) {
 					for (Condition curC : mappingConditions) {
 						Event pred = curC.getPreEvent();
@@ -514,7 +517,8 @@ public class RefinedOrderingRelationsMatrix {
 			if (cur instanceof Condition) {
 				Condition curCondition = (Condition) cur;
 				// xor-split
-				if (curCondition.isCutoffPost()) {
+				if (curCondition.isCutoffPost()
+						&& curCondition.getPostE().isEmpty()) {
 					curCondition = curCondition.getCorrespondingCondition();
 				}
 				if (curCondition.getPostE().size() > 1) {
@@ -532,11 +536,11 @@ public class RefinedOrderingRelationsMatrix {
 				// xor-join
 				Set<Condition> mappingConditions = new HashSet<Condition>();
 				if (curCondition.getMappingConditions() != null) {
-					mappingConditions.addAll(curCondition
-							.getMappingConditions());
-				} else {
-					mappingConditions.add(curCondition);
+					curCondition.getMappingConditions().stream()
+							.filter(c -> c.getPostE().isEmpty())
+							.forEach(mappingConditions::add);
 				}
+				mappingConditions.add(curCondition);
 				if (mappingConditions.size() > 1) {
 					for (Condition curC : mappingConditions) {
 						Event pred = curC.getPreEvent();
@@ -698,7 +702,8 @@ public class RefinedOrderingRelationsMatrix {
 		} else if (this._loopJoinConditions.contains(cur)) {
 			cur = ((Condition) cur).getCorrespondingCondition();
 			dfsFindTrace(cur, end, trace, sinkPlace, true, traceMap, visited);
-		} else if (cur instanceof Condition && ((Condition) cur).isCutoffPost()) {
+		} else if (cur instanceof Condition && ((Condition) cur).isCutoffPost()
+				&& ((Condition) cur).getPostE().isEmpty()) {
 			cur = ((Condition) cur).getCorrespondingCondition();
 			dfsFindTrace(cur, end, trace, sinkPlace, containLoop, traceMap,
 					visited);
@@ -739,7 +744,8 @@ public class RefinedOrderingRelationsMatrix {
 	private void dfsLoopJoin(IBPNode u, Set<INode> visited,
 			Set<Condition> loopJoinConditions) {
 		if (u instanceof Condition && visited.contains(u.getPetriNetNode())
-				&& ((Condition) u).isCutoffPost()) {
+				&& ((Condition) u).isCutoffPost()
+				&& ((Condition) u).getPostE().isEmpty()) {
 			loopJoinConditions.add((Condition) u);
 			return;
 		}
@@ -799,7 +805,7 @@ public class RefinedOrderingRelationsMatrix {
 			}
 			System.out.println();
 		}
-		
+
 		System.out.println("Sequential Direct Adjacency");
 		System.out.println(this._sda.toString());
 	}

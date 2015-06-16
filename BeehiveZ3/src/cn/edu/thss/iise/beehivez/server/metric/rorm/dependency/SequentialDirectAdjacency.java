@@ -84,7 +84,7 @@ public class SequentialDirectAdjacency {
 		while (canFire) {
 			canFire = false;
 			if (visited.contains(m.hashCode())) {
-				break;
+				return;
 			}
 			visited.add(m.hashCode());
 			for (Event e : m.getEnabledEvents()) {

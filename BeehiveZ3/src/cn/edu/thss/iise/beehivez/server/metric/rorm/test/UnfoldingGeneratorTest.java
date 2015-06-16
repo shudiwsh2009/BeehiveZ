@@ -15,6 +15,7 @@ import org.processmining.framework.plugin.ProvidedObject;
 import org.processmining.importing.pnml.PnmlImport;
 
 import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.JbptConversion;
+import cn.edu.thss.iise.beehivez.server.util.PetriNetUtil;
 
 public class UnfoldingGeneratorTest {
 
@@ -23,6 +24,7 @@ public class UnfoldingGeneratorTest {
 		int dotIndex = filePath1.lastIndexOf('.');
 		String filePath2 = filePath1.substring(0, dotIndex) + ".png";
 		String filepath3 = filePath1.substring(0, dotIndex) + "_cfp.png";
+		String filepath4 = filePath1.substring(0, dotIndex) + "_cfp.pnml";
 
 		PnmlImport pnmlImport = new PnmlImport();
 		PetriNet p1 = pnmlImport.read(new FileInputStream(new File(filePath1)));
@@ -37,7 +39,10 @@ public class UnfoldingGeneratorTest {
 		AbstractCondition.count = 0;
 		AbstractEvent.count = 0;
 		CompletePrefixUnfolding cpu = new CompletePrefixUnfolding(ns);
+		
+		//cfp
 		PetriNet p2 = JbptConversion.convert(cpu);
+		PetriNetUtil.export2pnml(p2, filepath4);
 
 		// cfp-png
 		ProvidedObject po2 = new ProvidedObject("petrinet", p2);
@@ -56,8 +61,8 @@ public class UnfoldingGeneratorTest {
 
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
-//		singlePng("C:\\Users\\Shudi\\Desktop\\rorm\\test\\DMKD07_M1.pnml");
-		batchPng("C:\\Users\\Shudi\\Desktop\\rorm\\test\\");
+		singlePng("C:\\Users\\Shudi\\Desktop\\rorm\\test\\DMKD07_M5.pnml");
+//		batchPng("C:\\Users\\Shudi\\Desktop\\rorm\\test\\");
 	}
 
 }

@@ -83,10 +83,10 @@ public class LeastCommonPredecessorsAndSuccessors {
 			Event e1 = events.get(i);
 			for (int j = i + 1; j < events.size(); ++j) {
 				Event e2 = events.get(j);
-//				if(e1.getTransition().getName().equals("T2")
-//						&& e2.getTransition().getName().equals("T5")) {
-//					int a = 1;
-//				}
+				// if(e1.getTransition().getName().equals("T2")
+				// && e2.getTransition().getName().equals("T5")) {
+				// int a = 1;
+				// }
 				boolean[] skipForwardSys = hasSkipForwardSys(e1, e2);
 				this.forwardSysSkip.get(e1).put(e2, skipForwardSys[0]);
 				this.forwardSysSkip.get(e2).put(e1, skipForwardSys[1]);
@@ -132,7 +132,8 @@ public class LeastCommonPredecessorsAndSuccessors {
 						u.getPetriNetNode())) {
 					lcsSet.add(u);
 				}
-			} else if (u instanceof Condition && ((Condition) u).isCutoffPost()) {
+			} else if (u instanceof Condition && ((Condition) u).isCutoffPost()
+					&& ((Condition) u).getPostE().isEmpty()) {
 				u = ((Condition) u).getCorrespondingCondition();
 				queue.offer(u);
 			} else {
@@ -171,7 +172,8 @@ public class LeastCommonPredecessorsAndSuccessors {
 						u.getPetriNetNode())) {
 					lcsSet.add(u);
 				}
-			} else if (u instanceof Condition && ((Condition) u).isCutoffPost()) {
+			} else if (u instanceof Condition && ((Condition) u).isCutoffPost()
+					&& ((Condition) u).getPostE().isEmpty()) {
 				u = ((Condition) u).getCorrespondingCondition();
 				queue.offer(u);
 			} else {
@@ -283,10 +285,11 @@ public class LeastCommonPredecessorsAndSuccessors {
 			} else if (u instanceof Condition) {
 				Set<Condition> conditions = new HashSet<Condition>();
 				if (((Condition) u).getMappingConditions() != null) {
-					conditions.addAll(((Condition) u).getMappingConditions());
-				} else {
-					conditions.add((Condition) u);
+					((Condition) u).getMappingConditions().stream()
+							.filter(c -> c.getPostE().isEmpty())
+							.forEach(conditions::add);
 				}
+				conditions.add((Condition) u);
 				for (Condition c : conditions) {
 					if (this._loopJoinConditions.contains(c)) {
 						continue;
@@ -330,10 +333,11 @@ public class LeastCommonPredecessorsAndSuccessors {
 			} else if (u instanceof Condition) {
 				Set<Condition> conditions = new HashSet<Condition>();
 				if (((Condition) u).getMappingConditions() != null) {
-					conditions.addAll(((Condition) u).getMappingConditions());
-				} else {
-					conditions.add((Condition) u);
+					((Condition) u).getMappingConditions().stream()
+							.filter(c -> c.getPostE().isEmpty())
+							.forEach(conditions::add);
 				}
+				conditions.add((Condition) u);
 				for (Condition c : conditions) {
 					if (this._loopJoinConditions.contains(c)) {
 						continue;
@@ -443,7 +447,8 @@ public class LeastCommonPredecessorsAndSuccessors {
 				if (this.cpuReachMap.get(e2).get(u)) {
 					lcsSet.add(u);
 				}
-			} else if (u instanceof Condition && ((Condition) u).isCutoffPost()) {
+			} else if (u instanceof Condition && ((Condition) u).isCutoffPost()
+					&& ((Condition) u).getPostE().isEmpty()) {
 				u = ((Condition) u).getCorrespondingCondition();
 				queue.offer(u);
 			} else {
@@ -480,7 +485,8 @@ public class LeastCommonPredecessorsAndSuccessors {
 				if (this.cpuReachMap.get(e1).get(u)) {
 					lcsSet.add(u);
 				}
-			} else if (u instanceof Condition && ((Condition) u).isCutoffPost()) {
+			} else if (u instanceof Condition && ((Condition) u).isCutoffPost()
+					&& ((Condition) u).getPostE().isEmpty()) {
 				u = ((Condition) u).getCorrespondingCondition();
 				queue.offer(u);
 			} else {
@@ -569,6 +575,11 @@ public class LeastCommonPredecessorsAndSuccessors {
 		boolean hasSourcePred1 = false, hasSourcePred2 = false;
 		// boolean hasLoopPred1 = false, hasLoopPred2 = false;
 		Place source = this._sys.getSourcePlaces().iterator().next();
+		// debug
+		if(e1.getTransition().getName().equals("T2")
+				&& e2.getTransition().getName().equals("T4")) {
+			System.out.println();
+		}
 		// step e1
 		Queue<IBPNode> queue = new LinkedList<IBPNode>();
 		queue.offer(e1);
@@ -632,10 +643,11 @@ public class LeastCommonPredecessorsAndSuccessors {
 			} else if (u instanceof Condition) {
 				Set<Condition> conditions = new HashSet<Condition>();
 				if (((Condition) u).getMappingConditions() != null) {
-					conditions.addAll(((Condition) u).getMappingConditions());
-				} else {
-					conditions.add((Condition) u);
+					((Condition) u).getMappingConditions().stream()
+							.filter(c -> c.getPostE().isEmpty())
+							.forEach(conditions::add);
 				}
+				conditions.add((Condition) u);
 				for (Condition c : conditions) {
 					if (this._loopJoinConditions.contains(c)) {
 						continue;
@@ -729,7 +741,8 @@ public class LeastCommonPredecessorsAndSuccessors {
 	private void dfsLoopJoin(IBPNode u, Set<INode> visited,
 			Set<Condition> loopJoinConditions) {
 		if (u instanceof Condition && visited.contains(u.getPetriNetNode())
-				&& ((Condition) u).isCutoffPost()) {
+				&& ((Condition) u).isCutoffPost()
+				&& ((Condition) u).getPostE().isEmpty()) {
 			loopJoinConditions.add((Condition) u);
 			return;
 		}
@@ -803,7 +816,8 @@ public class LeastCommonPredecessorsAndSuccessors {
 			trace.add(sinkCondition);
 			generateReachMap(trace);
 			trace.remove(trace.size() - 1);
-		} else if (u instanceof Condition && ((Condition) u).isCutoffPost()) {
+		} else if (u instanceof Condition && ((Condition) u).isCutoffPost()
+				&& ((Condition) u).getPostE().isEmpty()) {
 			u = ((Condition) u).getCorrespondingCondition();
 			dfsReachMap(u, trace, sink);
 		} else {

@@ -221,7 +221,7 @@ public class Marking extends HashMap<Condition, Integer> {
 				.forEach(c -> this.put(c, this.get(c) - 1));
 		Set<Event> newEvents = new HashSet<Event>();
 		for (Condition c : e.getPostConditions()) {
-			if (c.isCutoffPost()) {
+			if (c.isCutoffPost() && c.getPostE().isEmpty()) {
 				c = c.getCorrespondingCondition();
 			}
 			this.put(c, this.get(c) + 1);
@@ -252,7 +252,7 @@ public class Marking extends HashMap<Condition, Integer> {
 		e.getPreConditions().stream()
 			.forEach(c -> this.put(c, this.get(c) - 1));
 		for (Condition c : e.getPostConditions()) {
-			if (c.isCutoffPost()) {
+			if (c.isCutoffPost() && c.getPostE().isEmpty()) {
 				c = c.getCorrespondingCondition();
 			}
 			this.put(c, this.get(c) + 1);
