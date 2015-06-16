@@ -61,6 +61,9 @@ public class SequentialDirectAdjacency {
 					sdaRelations.get(m.getPreVisEvent().getTransition()).add(
 							postEvent.getTransition());
 				}
+				if(postEvent.getTransition().getName().equals("T3")) {
+					System.out.println();
+				}
 				// fire it and dfs
 				Marking newMarking = m.clone();
 				newMarking.fire(postEvent);
@@ -89,14 +92,43 @@ public class SequentialDirectAdjacency {
 			visited.add(m.hashCode());
 			for (Event e : m.getEnabledEvents()) {
 				if (this.checkEventInNFC(e)) {
-					Set<IBPNode> lcpSet = this._lc.getLcpCpuMap().get(e)
-							.get(m.getPreEvent());
-					boolean isConcurrent = !lcpSet.stream()
-							.anyMatch(
-									lcp -> (lcp instanceof Condition
-											|| lcp == e || lcp == m
-											.getPreEvent()));
+					boolean isConcurrent = false;
+					boolean canFireVis = true;
+					if (m.getPreInvEvent() == null) {
+						Set<IBPNode> lcpSet = this._lc.getLcpCpuMap().get(e)
+								.get(m.getPreVisEvent());
+						isConcurrent = !lcpSet.stream()
+								.anyMatch(
+										lcp -> (lcp instanceof Condition
+												|| lcp == e || lcp == m
+												.getPreVisEvent()));
+					} else {
+						Set<IBPNode> lcpSetInv = this._lc.getLcpCpuMap().get(e)
+								.get(m.getPreInvEvent());
+						Set<IBPNode> lcpSetVis = this._lc.getLcpCpuMap().get(e)
+								.get(m.getPreVisEvent());
+						boolean isConcurrentInv = !lcpSetInv.stream()
+								.anyMatch(
+										lcp -> (lcp instanceof Condition
+												|| lcp == e || lcp == m
+												.getPreInvEvent()));
+						boolean isConcurrentVis = !lcpSetVis.stream()
+								.anyMatch(
+										lcp -> (lcp instanceof Condition
+												|| lcp == e || lcp == m
+												.getPreVisEvent()));
+						if(isConcurrentInv && isConcurrentVis) {
+							isConcurrent = true;
+							canFireVis = true;
+						} else if(isConcurrentInv && !isConcurrentVis) {
+							isConcurrent = true;
+							canFireVis = false;
+						}
+					}
 					if (isConcurrent) {
+						if(!canFireVis && !e.getTransition().isSilent()) {
+							continue;
+						}
 						m.onlyFire(e);
 						// check postDisabledEvent every time
 						for (Event postEvent : m.getPostDisabledEvents()) {
@@ -124,12 +156,43 @@ public class SequentialDirectAdjacency {
 		}
 		// 2. if there is no such events, traverse to fire other enabled events
 		for (Event e : m.getEnabledEvents()) {
-			Set<IBPNode> lcpSet = this._lc.getLcpCpuMap().get(e)
-					.get(m.getPreEvent());
-			boolean isConcurrent = !lcpSet.stream().anyMatch(
-					lcp -> (lcp instanceof Condition || lcp == e || lcp == m
-							.getPreEvent()));
+			boolean isConcurrent = false;
+			boolean canFireVis = true;
+			if (m.getPreInvEvent() == null) {
+				Set<IBPNode> lcpSet = this._lc.getLcpCpuMap().get(e)
+						.get(m.getPreVisEvent());
+				isConcurrent = !lcpSet.stream()
+						.anyMatch(
+								lcp -> (lcp instanceof Condition
+										|| lcp == e || lcp == m
+										.getPreVisEvent()));
+			} else {
+				Set<IBPNode> lcpSetInv = this._lc.getLcpCpuMap().get(e)
+						.get(m.getPreInvEvent());
+				Set<IBPNode> lcpSetVis = this._lc.getLcpCpuMap().get(e)
+						.get(m.getPreVisEvent());
+				boolean isConcurrentInv = !lcpSetInv.stream()
+						.anyMatch(
+								lcp -> (lcp instanceof Condition
+										|| lcp == e || lcp == m
+										.getPreInvEvent()));
+				boolean isConcurrentVis = !lcpSetVis.stream()
+						.anyMatch(
+								lcp -> (lcp instanceof Condition
+										|| lcp == e || lcp == m
+										.getPreVisEvent()));
+				if(isConcurrentInv && isConcurrentVis) {
+					isConcurrent = true;
+					canFireVis = true;
+				} else if(isConcurrentInv && !isConcurrentVis) {
+					isConcurrent = true;
+					canFireVis = false;
+				}
+			}
 			if (isConcurrent) {
+				if(!canFireVis && !e.getTransition().isSilent()) {
+					continue;
+				}
 				Marking copyMarking = m.clone();
 				copyMarking.onlyFire(e);
 				// check postDisabledEvent every time

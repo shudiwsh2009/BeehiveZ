@@ -277,10 +277,6 @@ public class Marking extends HashMap<Condition, Integer> {
 	public Event getPreInvEvent() {
 		return preInvEvent;
 	}
-	
-	public Event getPreEvent() {
-		return preInvEvent != null ? preInvEvent : preVisEvent;
-	}
 
 	public Set<Event> getPostEnabledEvents() {
 		return postEnabledEvents;
