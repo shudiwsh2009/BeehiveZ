@@ -70,5 +70,7 @@
 	<classpathentry kind="lib" path="lib/LogCompleteness-0.01-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/plugins/estimators/trivialEstimator.jar"/>
 	<classpathentry kind="lib" path="lib/plugins/units/TaskSetUnit.jar"/>
+	<classpathentry kind="lib" path="lib/commons-math3-3.5-javadoc.jar"/>
+	<classpathentry kind="lib" path="lib/commons-math3-3.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

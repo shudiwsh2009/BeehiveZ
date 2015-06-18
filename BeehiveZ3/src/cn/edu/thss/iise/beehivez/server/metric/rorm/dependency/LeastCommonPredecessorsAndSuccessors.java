@@ -576,7 +576,7 @@ public class LeastCommonPredecessorsAndSuccessors {
 		// boolean hasLoopPred1 = false, hasLoopPred2 = false;
 		Place source = this._sys.getSourcePlaces().iterator().next();
 		// debug
-		if(e1.getTransition().getName().equals("T2")
+		if (e1.getTransition().getName().equals("T2")
 				&& e2.getTransition().getName().equals("T4")) {
 			System.out.println();
 		}
