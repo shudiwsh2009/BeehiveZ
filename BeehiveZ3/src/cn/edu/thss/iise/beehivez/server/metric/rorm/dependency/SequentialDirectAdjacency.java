@@ -27,7 +27,7 @@ public class SequentialDirectAdjacency {
 		this._sys = (NetSystem) cpu.getOriginativeNetSystem();
 		this._lc = lc;
 		generateSDA();
-		System.out.print(toString());
+//		System.out.print(toString());
 	}
 
 	private void generateSDA() {

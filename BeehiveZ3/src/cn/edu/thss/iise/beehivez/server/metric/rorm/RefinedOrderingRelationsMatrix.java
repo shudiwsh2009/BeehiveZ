@@ -19,6 +19,7 @@ import org.jbpt.petri.unfolding.Event;
 import org.jbpt.petri.unfolding.IBPNode;
 import org.processmining.framework.models.petrinet.PetriNet;
 
+import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.ImportanceComputation;
 import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.JbptConversion;
 import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.LeastCommonPredecessorsAndSuccessors;
 import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.SequentialDirectAdjacency;
@@ -69,6 +70,7 @@ public class RefinedOrderingRelationsMatrix {
 		generateCausalAndInverseCausalMatrix();
 		generateConcurrentMatrix();
 		generateSequentialDirectAdjacency();
+		generateRelationImportance();
 	}
 
 	private void generateCausalAndInverseCausalMatrix() {
@@ -640,6 +642,10 @@ public class RefinedOrderingRelationsMatrix {
 						.indexOf(value.getName())].adjacency = true;
 			}
 		}
+	}
+
+	private void generateRelationImportance() {
+		ImportanceComputation ic = new ImportanceComputation(this._cpu);
 	}
 
 	/**
