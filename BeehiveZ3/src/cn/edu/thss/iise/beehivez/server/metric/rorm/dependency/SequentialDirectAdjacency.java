@@ -61,9 +61,6 @@ public class SequentialDirectAdjacency {
 					sdaRelations.get(m.getPreVisEvent().getTransition()).add(
 							postEvent.getTransition());
 				}
-				if (postEvent.getTransition().getName().equals("T3")) {
-					System.out.println();
-				}
 				// fire it and dfs
 				Marking newMarking = m.clone();
 				newMarking.fire(postEvent);

@@ -83,10 +83,6 @@ public class LeastCommonPredecessorsAndSuccessors {
 			Event e1 = events.get(i);
 			for (int j = i + 1; j < events.size(); ++j) {
 				Event e2 = events.get(j);
-				// if(e1.getTransition().getName().equals("T2")
-				// && e2.getTransition().getName().equals("T5")) {
-				// int a = 1;
-				// }
 				boolean[] skipForwardSys = hasSkipForwardSys(e1, e2);
 				this.forwardSysSkip.get(e1).put(e2, skipForwardSys[0]);
 				this.forwardSysSkip.get(e2).put(e1, skipForwardSys[1]);
@@ -575,11 +571,6 @@ public class LeastCommonPredecessorsAndSuccessors {
 		boolean hasSourcePred1 = false, hasSourcePred2 = false;
 		// boolean hasLoopPred1 = false, hasLoopPred2 = false;
 		Place source = this._sys.getSourcePlaces().iterator().next();
-		// debug
-		if (e1.getTransition().getName().equals("T2")
-				&& e2.getTransition().getName().equals("T4")) {
-			System.out.println();
-		}
 		// step e1
 		Queue<IBPNode> queue = new LinkedList<IBPNode>();
 		queue.offer(e1);

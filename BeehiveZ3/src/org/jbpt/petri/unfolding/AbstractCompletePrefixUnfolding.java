@@ -298,6 +298,9 @@ public class AbstractCompletePrefixUnfolding<BPN extends IBPNode<N>, C extends I
 	protected void addCutoff(E e, E corr) {
 		this.cutoff2corr.put(e,corr);
 		// add by Shudi Wang 15/05/26 to create mapping conditions
+		while(this.cutoff2corr.containsKey(corr)) {
+			corr = this.cutoff2corr.get(corr);
+		}
 		for(C newC : e.getPostConditions()) {
 			newC.setCutoffPost(true);
 			for(C oldC : corr.getPostConditions()) {

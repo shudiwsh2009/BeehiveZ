@@ -1,14 +1,12 @@
 package cn.edu.thss.iise.beehivez.server.metric.rorm.dependency;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.DecompositionSolver;
 import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -21,16 +19,16 @@ import org.jbpt.petri.unfolding.Event;
 import org.jbpt.petri.unfolding.IBPNode;
 
 @SuppressWarnings("rawtypes")
-public class ImportanceComputation {
+public class RelationImportance {
 
 	private NetSystem _sys;
 	private CompletePrefixUnfolding _cpu;
 	private Map<IBPNode, Map<IBPNode, RealVector>> edges = new HashMap<IBPNode, Map<IBPNode, RealVector>>();
 	private Map<IBPNode, Map<IBPNode, Double>> importance = new HashMap<IBPNode, Map<IBPNode, Double>>();
-	private List<RealVector> equations = new ArrayList<RealVector>();
+	private Set<RealVector> equations = new HashSet<RealVector>();
 	private int unknown = 0;
 
-	public ImportanceComputation(CompletePrefixUnfolding cpu) {
+	public RelationImportance(CompletePrefixUnfolding cpu) {
 		this._cpu = cpu;
 		this._sys = (NetSystem) cpu.getOriginativeNetSystem();
 		Place sourcePlace = this._sys.getSourcePlaces().iterator().next();
@@ -38,6 +36,7 @@ public class ImportanceComputation {
 		Condition sourceCondition = this._cpu.getConditions(sourcePlace)
 				.iterator().next();
 		Set<IBPNode> visited = new HashSet<IBPNode>();
+		visited.add(sourceCondition);
 		dfsEquation(sourceCondition, null, visited, sourcePlace, sinkPlace);
 		solveEquations();
 		System.out.println(importance);
@@ -45,22 +44,17 @@ public class ImportanceComputation {
 
 	private void dfsEquation(IBPNode cur, IBPNode pre, Set<IBPNode> visited,
 			Place sourcePlace, Place sinkPlace) {
-		if (visited.contains(cur)) {
-			return;
-		}
-		visited.add(cur);
 		if (cur instanceof Condition) {
 			Condition curCondition = (Condition) cur;
-			RealVector inEdges = new ArrayRealVector();
+			if(curCondition.isCutoffPost() && curCondition.getPostE().isEmpty()) {
+				curCondition = curCondition.getCorrespondingCondition();
+			}
+			RealVector inEdges = new Polynomial();
 			// add up all the in-edges
 			// introduce unknown if not exist
 			if (curCondition.getPlace() == sourcePlace) {
 				inEdges = inEdges.append(1.0);
 			} else {
-				if (curCondition.isCutoffPost()
-						&& curCondition.getPostE().isEmpty()) {
-					curCondition = curCondition.getCorrespondingCondition();
-				}
 				Set<Condition> conditions = new HashSet<Condition>();
 				if (curCondition.getMappingConditions() != null) {
 					curCondition.getMappingConditions().stream()
@@ -69,13 +63,13 @@ public class ImportanceComputation {
 				}
 				conditions.add(curCondition);
 				for (Condition c : conditions) {
-					RealVector inEdge = new ArrayRealVector();
+					RealVector inEdge = new Polynomial();
 					if (edges.containsKey(c.getPreEvent())
 							&& edges.get(c.getPreEvent()).containsKey(
 									curCondition)) {
 						inEdge = edges.get(c.getPreEvent()).get(curCondition);
 					} else {
-						inEdge = new ArrayRealVector();
+						inEdge = new Polynomial();
 						++unknown;
 						while (inEdge.getDimension() < unknown) {
 							inEdge = inEdge.append(0);
@@ -97,8 +91,8 @@ public class ImportanceComputation {
 			}
 			//
 			if (curCondition.getPlace() == sinkPlace && unknown > 0) {
-				inEdges.addToEntry(0, -1);
-				equations.add(inEdges);
+//				inEdges.addToEntry(0, -1);
+//				equations.add(inEdges);
 			} else {
 				for (Event outEvent : curCondition.getPostE()) {
 					if (edges.containsKey(curCondition)
@@ -128,7 +122,10 @@ public class ImportanceComputation {
 				}
 			}
 			for (Event succ : curCondition.getPostE()) {
-				dfsEquation(succ, curCondition, visited, sourcePlace, sinkPlace);
+				if(!visited.contains(succ)) {
+					visited.add(succ);
+					dfsEquation(succ, curCondition, visited, sourcePlace, sinkPlace);
+				}
 			}
 		} else if (cur instanceof Event) {
 			RealVector curEdge = edges.get(pre).get(cur);
@@ -184,43 +181,66 @@ public class ImportanceComputation {
 				}
 			}
 			for (Condition succ : curEvent.getPostConditions()) {
-				dfsEquation(succ, curEvent, visited, sourcePlace, sinkPlace);
+				if (succ.isCutoffPost() && succ.getPostE().isEmpty()) {
+					succ = succ.getCorrespondingCondition();
+				}
+				if(!visited.contains(succ)) {
+					visited.add(succ);
+					dfsEquation(succ, curEvent, visited, sourcePlace, sinkPlace);
+				}
 			}
 		}
-		visited.remove(cur);
 	}
 
 	private void solveEquations() {
-		double[] solution = new double[0]; 
-		if(unknown > 0) {
+		double[] solution = new double[0];
+		if (unknown > 0) {
+			Iterator<RealVector> it = equations.iterator();
+			while (it.hasNext()) {
+				RealVector vec = it.next();
+				if (vec.getNorm() == 0) {
+					it.remove();
+				}
+//				System.out.println(vec.hashCode());
+			}
 			double[][] coefficients = new double[equations.size()][unknown];
 			double[] constants = new double[equations.size()];
-			for (int i = 0; i < equations.size(); ++i) {
-				RealVector equation = equations.get(i);
+//			System.out.println(equations);
+//			System.out.println(edges);
+			int i = 0;
+			for (RealVector equation : equations) {
 				constants[i] = -equation.getEntry(0);
 				for (int j = 1; j < equation.getDimension(); ++j) {
 					coefficients[i][j - 1] = equation.getEntry(j);
 				}
+				++i;
 			}
-			RealMatrix coefficientsmMatrix = new Array2DRowRealMatrix(coefficients,
-					false);
-			DecompositionSolver solver = new LUDecomposition(coefficientsmMatrix)
-					.getSolver();
-			RealVector constantsVector = new ArrayRealVector(constants);
+			RealMatrix coefficientsmMatrix = new Array2DRowRealMatrix(
+					coefficients, false);
+			DecompositionSolver solver = new LUDecomposition(
+					coefficientsmMatrix).getSolver();
+			RealVector constantsVector = new Polynomial(constants);
 			RealVector solutionVector = solver.solve(constantsVector);
 			solution = solutionVector.toArray();
 		}
-		for(Map.Entry<IBPNode, Map<IBPNode, RealVector>> outerEntry : edges.entrySet()) {
-			importance.putIfAbsent(outerEntry.getKey(), new HashMap<IBPNode, Double>());
-			for(Map.Entry<IBPNode, RealVector> innerEntry : outerEntry.getValue().entrySet()) {
+		for (Map.Entry<IBPNode, Map<IBPNode, RealVector>> outerEntry : edges
+				.entrySet()) {
+			importance.putIfAbsent(outerEntry.getKey(),
+					new HashMap<IBPNode, Double>());
+			for (Map.Entry<IBPNode, RealVector> innerEntry : outerEntry
+					.getValue().entrySet()) {
 				double[] edge = innerEntry.getValue().toArray();
 				double importance = edge[0];
-				for(int i = 1; i < edge.length; ++i) {
+				for (int i = 1; i < edge.length; ++i) {
 					importance += solution[i - 1] * edge[i];
 				}
-				this.importance.get(outerEntry.getKey()).putIfAbsent(innerEntry.getKey(), importance);
+				this.importance.get(outerEntry.getKey()).putIfAbsent(
+						innerEntry.getKey(), importance);
 			}
 		}
 	}
-}
 
+	public Map<IBPNode, Map<IBPNode, Double>> getImportance() {
+		return importance;
+	}
+}
