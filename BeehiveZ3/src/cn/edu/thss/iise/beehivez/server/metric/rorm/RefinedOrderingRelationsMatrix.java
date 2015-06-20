@@ -19,6 +19,7 @@ import org.jbpt.petri.unfolding.Event;
 import org.jbpt.petri.unfolding.IBPNode;
 import org.processmining.framework.models.petrinet.PetriNet;
 
+import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.RelationImportance;
 import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.JbptConversion;
 import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.LeastCommonPredecessorsAndSuccessors;
 import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.SequentialDirectAdjacency;
@@ -34,11 +35,13 @@ public class RefinedOrderingRelationsMatrix {
 	private RefinedOrderingRelation[][] causalMatrix;
 	private RefinedOrderingRelation[][] inverseCausalMatrix;
 	private RefinedOrderingRelation[][] concurrentMatrix;
+	private Map<String, Double[]> importance = new HashMap<String, Double[]>();
 	private List<String> tName;
 
 	private Set<Condition> _loopJoinConditions = new HashSet<Condition>();
 	private LeastCommonPredecessorsAndSuccessors _lc;
 	private SequentialDirectAdjacency _sda;
+	private RelationImportance _ri;
 
 	public RefinedOrderingRelationsMatrix(PetriNet pn) {
 		this(JbptConversion.convert(pn));
@@ -69,6 +72,7 @@ public class RefinedOrderingRelationsMatrix {
 		generateCausalAndInverseCausalMatrix();
 		generateConcurrentMatrix();
 		generateSequentialDirectAdjacency();
+		generateRelationImportance();
 	}
 
 	private void generateCausalAndInverseCausalMatrix() {
@@ -638,6 +642,24 @@ public class RefinedOrderingRelationsMatrix {
 						.indexOf(value.getName())].adjacency = true;
 				this.inverseCausalMatrix[this.tName.indexOf(key.getName())][this.tName
 						.indexOf(value.getName())].adjacency = true;
+			}
+		}
+	}
+
+	private void generateRelationImportance() {
+		this._ri = new RelationImportance(this._cpu);
+		for(Map.Entry<IBPNode, Map<IBPNode, Double>> outerEntry : this._ri.getImportance().entrySet()) {
+			IBPNode from = outerEntry.getKey();
+			for(Map.Entry<IBPNode, Double> innerEntry : outerEntry.getValue().entrySet()) {
+				IBPNode to = innerEntry.getKey();
+				double im = innerEntry.getValue();
+				if(from instanceof Event) {
+					this.importance.putIfAbsent(((Event) from).getTransition().getName(), new Double[2]);
+					this.importance.get(((Event) from).getTransition().getName())[0] = im;
+				} else if(to instanceof Event) {
+					this.importance.putIfAbsent(((Event) to).getTransition().getName(), new Double[2]);
+					this.importance.get(((Event) to).getTransition().getName())[1] = im;
+				}
 			}
 		}
 	}

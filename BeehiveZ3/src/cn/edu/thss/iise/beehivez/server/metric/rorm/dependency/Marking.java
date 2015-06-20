@@ -197,12 +197,14 @@ public class Marking extends HashMap<Condition, Integer> {
 
 	public Set<Event> getEnabledEvents() {
 		Set<Event> enabledEvents = new HashSet<Event>();
-		this._cpu.getEvents().stream().filter(this::isEnabled).forEach(enabledEvents::add);
+		this._cpu.getEvents().stream().filter(this::isEnabled)
+				.forEach(enabledEvents::add);
 		return enabledEvents;
 	}
 
 	/**
 	 * Fire e and update preEvent & postEvents
+	 * 
 	 * @param e
 	 * @return
 	 */
@@ -211,7 +213,7 @@ public class Marking extends HashMap<Condition, Integer> {
 			return false;
 		}
 
-		if(e.getTransition().isSilent()) {
+		if (e.getTransition().isSilent()) {
 			this.preInvEvent = e;
 		} else {
 			this.preInvEvent = null;
@@ -229,8 +231,8 @@ public class Marking extends HashMap<Condition, Integer> {
 		}
 		this.postEnabledEvents.clear();
 		this.postDisabledEvents.clear();
-		for(Event newEvent : newEvents) {
-			if(this.isEnabled(newEvent)) {
+		for (Event newEvent : newEvents) {
+			if (this.isEnabled(newEvent)) {
 				this.postEnabledEvents.add(newEvent);
 			} else {
 				this.postDisabledEvents.add(newEvent);
@@ -239,9 +241,10 @@ public class Marking extends HashMap<Condition, Integer> {
 
 		return true;
 	}
-	
+
 	/**
 	 * Only fire e without updating preEvent & postEvents
+	 * 
 	 * @param e
 	 * @return
 	 */
@@ -250,7 +253,7 @@ public class Marking extends HashMap<Condition, Integer> {
 			return false;
 		}
 		e.getPreConditions().stream()
-			.forEach(c -> this.put(c, this.get(c) - 1));
+				.forEach(c -> this.put(c, this.get(c) - 1));
 		for (Condition c : e.getPostConditions()) {
 			if (c.isCutoffPost() && c.getPostE().isEmpty()) {
 				c = c.getCorrespondingCondition();
@@ -265,15 +268,17 @@ public class Marking extends HashMap<Condition, Integer> {
 		cloneMarking._cpu = this._cpu;
 		cloneMarking.preVisEvent = this.preVisEvent;
 		cloneMarking.preInvEvent = this.preInvEvent;
-		cloneMarking.postEnabledEvents = new HashSet<Event>(this.postEnabledEvents);
-		cloneMarking.postDisabledEvents = new HashSet<Event>(this.postDisabledEvents);
+		cloneMarking.postEnabledEvents = new HashSet<Event>(
+				this.postEnabledEvents);
+		cloneMarking.postDisabledEvents = new HashSet<Event>(
+				this.postDisabledEvents);
 		return cloneMarking;
 	}
 
 	public Event getPreVisEvent() {
 		return preVisEvent;
 	}
-	
+
 	public Event getPreInvEvent() {
 		return preInvEvent;
 	}
@@ -281,7 +286,7 @@ public class Marking extends HashMap<Condition, Integer> {
 	public Set<Event> getPostEnabledEvents() {
 		return postEnabledEvents;
 	}
-	
+
 	public Set<Event> getPostDisabledEvents() {
 		return postDisabledEvents;
 	}
