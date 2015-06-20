@@ -1,5 +1,5 @@
 /**
- * Behavioral Petri Net Similarity Algorithm based on Shortest Synchronization Distance
+ * Behavioral Petri Net Similarity Algorithm based on the Matrix of Refined Ordering Relations with Uncertainty
  */
 package cn.edu.thss.iise.beehivez.server.metric.rorm;
 
@@ -88,7 +88,7 @@ public class RormSimilarity extends PetriNetSimilarity {
 	@Override
 	public String getName() {
 		// TODO Auto-generated method stub
-		return "Extended Causal Footprint Matrix Similarity";
+		return "RORM Simialrity";
 	}
 
 	/*
@@ -101,7 +101,7 @@ public class RormSimilarity extends PetriNetSimilarity {
 	@Override
 	public String getDesription() {
 		// TODO Auto-generated method stub
-		return "Behavioral Petri Net Similarity Algorithm based on Extended Causal Footprint Matrix Similarity, which is computed on Complete Finite Prefix.";
+		return "Behavioral Petri Net Similarity Algorithm based on the Matrix of Refined Ordering Realtions with Uncertainty.";
 	}
 
 	public static void main(String[] args) throws Exception {
