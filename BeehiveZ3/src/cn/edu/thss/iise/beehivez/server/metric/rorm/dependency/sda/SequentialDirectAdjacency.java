@@ -1,4 +1,4 @@
-package cn.edu.thss.iise.beehivez.server.metric.rorm.dependency;
+package cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.sda;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,6 +11,8 @@ import org.jbpt.petri.unfolding.CompletePrefixUnfolding;
 import org.jbpt.petri.unfolding.Condition;
 import org.jbpt.petri.unfolding.Event;
 import org.jbpt.petri.unfolding.IBPNode;
+
+import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.lc.LeastCommonPredecessorsAndSuccessors;
 
 public class SequentialDirectAdjacency {
 

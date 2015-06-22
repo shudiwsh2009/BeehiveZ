@@ -19,10 +19,10 @@ import org.jbpt.petri.unfolding.Event;
 import org.jbpt.petri.unfolding.IBPNode;
 import org.processmining.framework.models.petrinet.PetriNet;
 
-import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.RelationImportance;
 import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.JbptConversion;
-import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.LeastCommonPredecessorsAndSuccessors;
-import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.SequentialDirectAdjacency;
+import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.importance.RelationImportance;
+import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.lc.LeastCommonPredecessorsAndSuccessors;
+import cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.sda.SequentialDirectAdjacency;
 
 @SuppressWarnings("rawtypes")
 public class RefinedOrderingRelationsMatrix {

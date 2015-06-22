@@ -1,4 +1,4 @@
-package cn.edu.thss.iise.beehivez.server.metric.rorm.dependency;
+package cn.edu.thss.iise.beehivez.server.metric.rorm.dependency.importance;
 
 import java.util.HashMap;
 import java.util.HashSet;
