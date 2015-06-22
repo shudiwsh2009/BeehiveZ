@@ -648,16 +648,21 @@ public class RefinedOrderingRelationsMatrix {
 
 	private void generateRelationImportance() {
 		this._ri = new RelationImportance(this._cpu);
-		for(Map.Entry<IBPNode, Map<IBPNode, Double>> outerEntry : this._ri.getImportance().entrySet()) {
+		for (Map.Entry<IBPNode, Map<IBPNode, Double>> outerEntry : this._ri
+				.getImportance().entrySet()) {
 			IBPNode from = outerEntry.getKey();
-			for(Map.Entry<IBPNode, Double> innerEntry : outerEntry.getValue().entrySet()) {
+			for (Map.Entry<IBPNode, Double> innerEntry : outerEntry.getValue()
+					.entrySet()) {
 				IBPNode to = innerEntry.getKey();
 				double im = innerEntry.getValue();
-				if(from instanceof Event) {
-					this.importance.putIfAbsent(((Event) from).getTransition().getName(), new Double[2]);
-					this.importance.get(((Event) from).getTransition().getName())[0] = im;
-				} else if(to instanceof Event) {
-					this.importance.putIfAbsent(((Event) to).getTransition().getName(), new Double[2]);
+				if (from instanceof Event) {
+					this.importance.putIfAbsent(((Event) from).getTransition()
+							.getName(), new Double[2]);
+					this.importance.get(((Event) from).getTransition()
+							.getName())[0] = im;
+				} else if (to instanceof Event) {
+					this.importance.putIfAbsent(((Event) to).getTransition()
+							.getName(), new Double[2]);
 					this.importance.get(((Event) to).getTransition().getName())[1] = im;
 				}
 			}

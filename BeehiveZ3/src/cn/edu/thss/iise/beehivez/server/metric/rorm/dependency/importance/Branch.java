@@ -20,7 +20,7 @@ public class Branch {
 	
 	@Override
 	public String toString() {
-		return cur.getName();
+		return cur.getName() + "," + inEdges;
 	}
 
 	public IBPNode getCur() {

@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
@@ -36,6 +35,7 @@ public class RelationImportance {
 		this._cpu = cpu;
 		this._sys = (NetSystem) cpu.getOriginativeNetSystem();
 		searchEquations();
+		System.out.println(equations);
 		solveEquations();
 		System.out.println(importance);
 	}
@@ -66,8 +66,9 @@ public class RelationImportance {
 		IBPNode cur = branch.getCur();
 		if (cur instanceof Condition && loopJoinConditions.contains(cur)) {
 			activeBranches.remove(branch);
-		} else if (((cur instanceof Condition && ((Condition) cur).getMappingConditions() != null) 
-				|| (cur instanceof Event && ((Event) cur).getPreConditions().size() > 1)) 
+		} else if (((cur instanceof Condition && ((Condition) cur)
+				.getMappingConditions() != null) || (cur instanceof Event && ((Event) cur)
+				.getPreConditions().size() > 1))
 				&& !branch.isMerged()) {
 			branch.setWaiting(true);
 			activeBranches.remove(branch);
@@ -105,22 +106,29 @@ public class RelationImportance {
 					Condition corrCondition = (outCondition.isCutoffPost() && outCondition
 							.getPostE().isEmpty()) ? outCondition
 							.getCorrespondingCondition() : outCondition;
-					if(edges.containsKey(curEvent) && edges.get(curEvent).containsKey(corrCondition)) {
-						RealVector otherEdge = edges.get(curEvent).get(corrCondition);
+					if (edges.containsKey(curEvent)
+							&& edges.get(curEvent).containsKey(corrCondition)) {
+						RealVector otherEdge = edges.get(curEvent).get(
+								corrCondition);
 						RealVector outEdge = inEdge.copy();
-						while(otherEdge.getDimension() < outEdge.getDimension()) {
+						while (otherEdge.getDimension() < outEdge
+								.getDimension()) {
 							otherEdge = otherEdge.append(0);
 						}
-						while(outEdge.getDimension() < otherEdge.getDimension()) {
+						while (outEdge.getDimension() < otherEdge
+								.getDimension()) {
 							outEdge = outEdge.append(0);
 						}
 						outEdge = outEdge.subtract(otherEdge);
 						equations.add(outEdge);
 					} else {
-						edges.putIfAbsent(curEvent, new HashMap<IBPNode, RealVector>());
-						edges.get(curEvent).putIfAbsent(corrCondition, inEdge.copy());
+						edges.putIfAbsent(curEvent,
+								new HashMap<IBPNode, RealVector>());
+						edges.get(curEvent).putIfAbsent(corrCondition,
+								inEdge.copy());
 					}
-					Branch newBranch = new Branch(outCondition, inEdge.copy(), false, false);
+					Branch newBranch = new Branch(outCondition, inEdge.copy(),
+							false, false);
 					forwardBranch(newBranch, sinkPlace);
 				}
 			}
@@ -129,75 +137,84 @@ public class RelationImportance {
 
 	private void mergeBranch(Branch branch) {
 		IBPNode cur = branch.getCur();
-		if(cur instanceof Condition) {
+		if (cur instanceof Condition) {
 			Condition curCondition = (Condition) cur;
 			Set<Branch> tmp = new HashSet<Branch>();
-			for(Branch b : waitingBranchs) {
-				if(curCondition.getMappingConditions().contains(b.getCur())) {
+			for (Branch b : waitingBranchs) {
+				if (curCondition.getMappingConditions().contains(b.getCur())) {
 					tmp.add(b);
 				}
 			}
-			if(tmp.size() == noLoopMerge(curCondition)) {
+			if (tmp.size() == noLoopMerge(curCondition)) {
 				List<Branch> newBranches = new ArrayList<Branch>();
 				RealVector inEdges = new Polynomial();
-				for(Branch b : tmp) {
+				for (Branch b : tmp) {
 					RealVector otherEdges = b.getInEdges();
-					while(inEdges.getDimension() < otherEdges.getDimension()) {
+					while (inEdges.getDimension() < otherEdges.getDimension()) {
 						inEdges = inEdges.append(0);
 					}
-					while(otherEdges.getDimension() < inEdges.getDimension()) {
+					while (otherEdges.getDimension() < inEdges.getDimension()) {
 						otherEdges = otherEdges.append(0);
 					}
 					inEdges = inEdges.add(otherEdges);
-					if(!((Condition)b.getCur()).isCutoffPost()
-							|| !((Condition)b.getCur()).getPostE().isEmpty()) {
-						Branch newBranch = new Branch(b.getCur(), new Polynomial(), false, true);
+					if (!((Condition) b.getCur()).isCutoffPost()
+							|| !((Condition) b.getCur()).getPostE().isEmpty()) {
+						Branch newBranch = new Branch(b.getCur(),
+								new Polynomial(), false, true);
 						waitingBranchs.remove(b);
 						newBranches.add(newBranch);
 					}
 				}
 				// add unknown number for loop XOR-join condition
-				Set<Condition> mappingConditions = curCondition.getMappingConditions();
-				for(Condition mappingC : mappingConditions) {
-					if(loopJoinConditions.contains(mappingC)) {
+				Set<Condition> mappingConditions = curCondition
+						.getMappingConditions();
+				for (Condition mappingC : mappingConditions) {
+					if (loopJoinConditions.contains(mappingC)) {
 						RealVector inEdge = new Polynomial();
-						if(edges.containsKey(mappingC.getPreEvent()) && edges.get(mappingC.getPreEvent()).containsKey(mappingC.getCorrespondingCondition())) {
-							inEdge = edges.get(mappingC.getPreEvent()).get(mappingC.getCorrespondingCondition());
+						if (edges.containsKey(mappingC.getPreEvent())
+								&& edges.get(mappingC.getPreEvent())
+										.containsKey(
+												mappingC.getCorrespondingCondition())) {
+							inEdge = edges.get(mappingC.getPreEvent()).get(
+									mappingC.getCorrespondingCondition());
 						} else {
 							inEdge = new Polynomial();
 							++unknown;
-							while(inEdge.getDimension() < unknown) {
+							while (inEdge.getDimension() < unknown) {
 								inEdge = inEdge.append(0);
 							}
 							inEdge = inEdge.append(1);
 						}
-						while(inEdge.getDimension() < inEdges.getDimension()) {
+						while (inEdge.getDimension() < inEdges.getDimension()) {
 							inEdge = inEdge.append(0);
 						}
-						while(inEdges.getDimension() < inEdge.getDimension()) {
+						while (inEdges.getDimension() < inEdge.getDimension()) {
 							inEdges = inEdges.append(0);
 						}
-						inEdges.add(inEdge);
-						edges.putIfAbsent(mappingC.getPreEvent(), new HashMap<IBPNode, RealVector>());
-						edges.get(mappingC.getPreEvent()).putIfAbsent(mappingC.getCorrespondingCondition(), inEdge);
+						inEdges = inEdges.add(inEdge);
+						edges.putIfAbsent(mappingC.getPreEvent(),
+								new HashMap<IBPNode, RealVector>());
+						edges.get(mappingC.getPreEvent()).putIfAbsent(
+								mappingC.getCorrespondingCondition(), inEdge);
 					}
 				}
-				for(Branch b : newBranches) {
+				for (Branch b : newBranches) {
 					b.setInEdges(inEdges.copy());
 					activeBranches.add(b);
 				}
 			}
-		} else if(cur instanceof Event) {
+		} else if (cur instanceof Event) {
 			Event curEvent = (Event) cur;
 			int merge = curEvent.getPreConditions().size();
 			Set<Branch> tmp = new HashSet<Branch>();
-			for(Branch b : waitingBranchs) {
-				if(b.getCur() == cur) {
+			for (Branch b : waitingBranchs) {
+				if (b.getCur() == cur) {
 					tmp.add(b);
 				}
 			}
-			if(tmp.size() == merge) {
-				Branch newBranch = new Branch(curEvent, branch.getInEdges().copy(), false, true);
+			if (tmp.size() == merge) {
+				Branch newBranch = new Branch(curEvent, branch.getInEdges()
+						.copy(), false, true);
 				waitingBranchs.removeAll(tmp);
 				activeBranches.add(newBranch);
 			}
@@ -254,7 +271,7 @@ public class RelationImportance {
 
 	private int noLoopMerge(Condition condition) {
 		Set<Condition> mappingConditions = condition.getMappingConditions();
-		if(mappingConditions == null || mappingConditions.isEmpty()) {
+		if (mappingConditions == null || mappingConditions.isEmpty()) {
 			return 1;
 		}
 		int count = 0;
