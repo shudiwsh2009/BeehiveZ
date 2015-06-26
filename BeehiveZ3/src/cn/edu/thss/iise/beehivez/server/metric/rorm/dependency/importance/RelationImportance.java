@@ -35,9 +35,9 @@ public class RelationImportance {
 		this._cpu = cpu;
 		this._sys = (NetSystem) cpu.getOriginativeNetSystem();
 		searchEquations();
-		System.out.println(equations);
+//		System.out.println(equations);
 		solveEquations();
-		System.out.println(importance);
+//		System.out.println(importance);
 	}
 
 	private Set<Branch> activeBranches = new HashSet<Branch>();

@@ -3,16 +3,15 @@
  */
 package cn.edu.thss.iise.beehivez.server.metric.rorm;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jbpt.petri.NetSystem;
+import org.jbpt.petri.io.PNMLSerializer;
 import org.processmining.framework.models.petrinet.PetriNet;
-import org.processmining.importing.pnml.PnmlImport;
 
 import cn.edu.thss.iise.beehivez.server.metric.PetriNetSimilarity;
 
@@ -29,15 +28,18 @@ public class RormSimilarity extends PetriNetSimilarity {
 	}
 
 	public float similarity(PetriNet pn1, PetriNet pn2, int internal) {
-		RefinedOrderingRelationsMatrix ecfm1 = new RefinedOrderingRelationsMatrix(
-				pn1);
-		RefinedOrderingRelationsMatrix ecfm2 = new RefinedOrderingRelationsMatrix(
-				pn2);
+		RefinedOrderingRelationsMatrix ecfm1 = new RefinedOrderingRelationsMatrix(pn1);
+		RefinedOrderingRelationsMatrix ecfm2 = new RefinedOrderingRelationsMatrix(pn2);
 		return similarity(ecfm1, ecfm2);
 	}
 
-	public float similarity(RefinedOrderingRelationsMatrix matrix1,
-			RefinedOrderingRelationsMatrix matrix2) {
+	public float similarity(NetSystem net1, NetSystem net2) {
+		RefinedOrderingRelationsMatrix ecfm1 = new RefinedOrderingRelationsMatrix(net1);
+		RefinedOrderingRelationsMatrix ecfm2 = new RefinedOrderingRelationsMatrix(net2);
+		return similarity(ecfm1, ecfm2);
+	}
+
+	public float similarity(RefinedOrderingRelationsMatrix matrix1, RefinedOrderingRelationsMatrix matrix2) {
 		List<String> tName1 = matrix1.gettName();
 		List<String> tName2 = matrix2.gettName();
 		List<String> interNames = new ArrayList<String>();
@@ -69,8 +71,7 @@ public class RormSimilarity extends PetriNetSimilarity {
 			for (int j = 0; j < tName1.size(); ++j) {
 				int idx2j = tName2.indexOf(tName1.get(j));
 				if (idx2i != -1 && idx2j != -1) {
-					causalUnion += matrix1.getCausalMatrix()[i][j]
-							.union(matrix2.getCausalMatrix()[idx2i][idx2j]);
+					causalUnion += matrix1.getCausalMatrix()[i][j].union(matrix2.getCausalMatrix()[idx2i][idx2j]);
 					inverseCausalUnion += matrix1.getInverseCausalMatrix()[i][j]
 							.union(matrix2.getCausalMatrix()[idx2i][idx2j]);
 					concurrentUnion += matrix1.getConcurrentMatrix()[i][j]
@@ -105,8 +106,7 @@ public class RormSimilarity extends PetriNetSimilarity {
 		double causalSim = causalInter / causalUnion;
 		double inverseCausalSim = inverseCausalInter / inverseCausalUnion;
 		double concurrentSim = concurrentInter / concurrentUnion;
-		System.out.println(causalSim + " " + inverseCausalSim + " "
-				+ concurrentSim);
+		System.out.println(causalSim + " " + inverseCausalSim + " " + concurrentSim);
 		return (float) ((causalSim + inverseCausalSim + concurrentSim) / 3);
 	}
 
@@ -144,23 +144,32 @@ public class RormSimilarity extends PetriNetSimilarity {
 		// String filePath =
 		// "/Users/shudi/Desktop/parallel_A_with_outer_loop.pnml";
 		// String filePath = "/Users/shudi/Desktop/M15.pnml";
-		PnmlImport pnmlImport = new PnmlImport();
 
-		String filePath = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\M0.pnml";
-		PetriNet pn = pnmlImport.read(new FileInputStream(new File(filePath)));
-		RefinedOrderingRelationsMatrix rorm = new RefinedOrderingRelationsMatrix(
-				(PetriNet) pn.clone());
+		PNMLSerializer pnmlSerializer = new PNMLSerializer();
+		String filePath = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\DMKD07_M5.pnml";
+		NetSystem net = pnmlSerializer.parse(filePath);
+		RefinedOrderingRelationsMatrix rorm = new RefinedOrderingRelationsMatrix(net);
 		rorm.printMatrix();
 
 		// String filepath1 =
 		// "C:\\Users\\Shudi\\Desktop\\rorm\\test\\parallel_inv_1_a.pnml";
 		// String filepath2 =
 		// "C:\\Users\\Shudi\\Desktop\\rorm\\test\\parallel_inv_1_b.pnml";
-		// PetriNet pn1 = pnmlImport
-		// .read(new FileInputStream(new File(filepath1)));
-		// PetriNet pn2 = pnmlImport
-		// .read(new FileInputStream(new File(filepath2)));
+		// PetriNet pn1 = pnmlImport.read(new FileInputStream(new
+		// File(filepath1)));
+		// PetriNet pn2 = pnmlImport.read(new FileInputStream(new
+		// File(filepath2)));
 		// PetriNetSimilarity sim = new RormSimilarity();
 		// System.out.println(sim.similarity(pn1, pn2));
+
+		// PNMLSerializer pnmlSerializer = new PNMLSerializer();
+		// String filepath1 =
+		// "C:\\Users\\Shudi\\Desktop\\rorm\\test\\parallel_inv_1_a.pnml";
+		// String filepath2 =
+		// "C:\\Users\\Shudi\\Desktop\\rorm\\test\\parallel_inv_1_b.pnml";
+		// NetSystem net1 = pnmlSerializer.parse(filepath1);
+		// NetSystem net2 = pnmlSerializer.parse(filepath2);
+		// RormSimilarity sim = new RormSimilarity();
+		// System.out.println(sim.similarity(net1, net2));
 	}
 }

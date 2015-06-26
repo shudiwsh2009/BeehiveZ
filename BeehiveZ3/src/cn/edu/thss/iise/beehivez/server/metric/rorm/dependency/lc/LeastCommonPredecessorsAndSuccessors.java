@@ -116,25 +116,21 @@ public class LeastCommonPredecessorsAndSuccessors {
 		queue.offer(e1);
 		while (!queue.isEmpty()) {
 			IBPNode u = queue.poll();
-			if (u instanceof Event
-					&& ((Event) u).getTransition() == e2.getTransition()) {
+			if (u instanceof Event && ((Event) u).getTransition() == e2.getTransition()) {
 				continue;
 			} else if (this._loopJoinConditions.contains(u)) {
 				// hasLoopSucc1 = true;
-			} else if (u instanceof Condition
-					&& ((Condition) u).getPlace() == sink) {
+			} else if (u instanceof Condition && ((Condition) u).getPlace() == sink) {
 				hasSinkSucc1 = true;
-				if (this.sysReachMap.get(e2.getPetriNetNode()).get(
-						u.getPetriNetNode())) {
+				if (this.sysReachMap.get(e2.getPetriNetNode()).get(u.getPetriNetNode())) {
 					lcsSet.add(u);
 				}
-			} else if (u instanceof Condition && ((Condition) u).isCutoffPost()
-					&& ((Condition) u).getPostE().isEmpty()) {
+			} else
+				if (u instanceof Condition && ((Condition) u).isCutoffPost() && ((Condition) u).getPostE().isEmpty()) {
 				u = ((Condition) u).getCorrespondingCondition();
 				queue.offer(u);
 			} else {
-				if (this.sysReachMap.get(e2.getPetriNetNode()).get(
-						u.getPetriNetNode())) {
+				if (this.sysReachMap.get(e2.getPetriNetNode()).get(u.getPetriNetNode())) {
 					lcsSet.add(u);
 					continue;
 				}
@@ -156,25 +152,21 @@ public class LeastCommonPredecessorsAndSuccessors {
 		queue.offer(e2);
 		while (!queue.isEmpty()) {
 			IBPNode u = queue.poll();
-			if (u instanceof Event
-					&& ((Event) u).getTransition() == e1.getTransition()) {
+			if (u instanceof Event && ((Event) u).getTransition() == e1.getTransition()) {
 				continue;
 			} else if (this._loopJoinConditions.contains(u)) {
 				// hasLoopSucc2 = true;
-			} else if (u instanceof Condition
-					&& ((Condition) u).getPlace() == sink) {
+			} else if (u instanceof Condition && ((Condition) u).getPlace() == sink) {
 				hasSinkSucc2 = true;
-				if (this.sysReachMap.get(e1.getPetriNetNode()).get(
-						u.getPetriNetNode())) {
+				if (this.sysReachMap.get(e1.getPetriNetNode()).get(u.getPetriNetNode())) {
 					lcsSet.add(u);
 				}
-			} else if (u instanceof Condition && ((Condition) u).isCutoffPost()
-					&& ((Condition) u).getPostE().isEmpty()) {
+			} else
+				if (u instanceof Condition && ((Condition) u).isCutoffPost() && ((Condition) u).getPostE().isEmpty()) {
 				u = ((Condition) u).getCorrespondingCondition();
 				queue.offer(u);
 			} else {
-				if (this.sysReachMap.get(e1.getPetriNetNode()).get(
-						u.getPetriNetNode())) {
+				if (this.sysReachMap.get(e1.getPetriNetNode()).get(u.getPetriNetNode())) {
 					lcsSet.add(u);
 					continue;
 				}
@@ -230,13 +222,11 @@ public class LeastCommonPredecessorsAndSuccessors {
 			boolean filter = false;
 			while (it.hasNext()) {
 				IBPNode v = it.next();
-				if (this.sysReachMap.get(v.getPetriNetNode()).get(
-						lcs.getPetriNetNode())) {
+				if (this.sysReachMap.get(v.getPetriNetNode()).get(lcs.getPetriNetNode())) {
 					filter = true;
 					break;
 				}
-				if (this.sysReachMap.get(lcs.getPetriNetNode()).get(
-						v.getPetriNetNode())) {
+				if (this.sysReachMap.get(lcs.getPetriNetNode()).get(v.getPetriNetNode())) {
 					it.remove();
 				}
 			}
@@ -266,23 +256,19 @@ public class LeastCommonPredecessorsAndSuccessors {
 		queue.offer(e1);
 		while (!queue.isEmpty()) {
 			IBPNode u = queue.poll();
-			if (u instanceof Event
-					&& ((Event) u).getTransition() == e2.getTransition()) {
+			if (u instanceof Event && ((Event) u).getTransition() == e2.getTransition()) {
 				continue;
 			} else if (this._loopJoinConditions.contains(u)) {
 				// hasLoopPred1 = true;
-			} else if (u instanceof Condition
-					&& ((Condition) u).getPlace() == source) {
+			} else if (u instanceof Condition && ((Condition) u).getPlace() == source) {
 				hasSourcePred1 = true;
-				if (this.sysReachMap.get(u.getPetriNetNode()).get(
-						e2.getPetriNetNode())) {
+				if (this.sysReachMap.get(u.getPetriNetNode()).get(e2.getPetriNetNode())) {
 					lcpSet.add(u);
 				}
 			} else if (u instanceof Condition) {
 				Set<Condition> conditions = new HashSet<Condition>();
 				if (((Condition) u).getMappingConditions() != null) {
-					((Condition) u).getMappingConditions().stream()
-							.filter(c -> c.getPostE().isEmpty())
+					((Condition) u).getMappingConditions().stream().filter(c -> c.getPostE().isEmpty())
 							.forEach(conditions::add);
 				}
 				conditions.add((Condition) u);
@@ -290,16 +276,14 @@ public class LeastCommonPredecessorsAndSuccessors {
 					if (this._loopJoinConditions.contains(c)) {
 						continue;
 					}
-					if (this.sysReachMap.get(c.getPetriNetNode()).get(
-							e2.getPetriNetNode())) {
+					if (this.sysReachMap.get(c.getPetriNetNode()).get(e2.getPetriNetNode())) {
 						lcpSet.add(c);
 						continue;
 					}
 					queue.offer(c.getPreEvent());
 				}
 			} else {
-				if (this.sysReachMap.get(u.getPetriNetNode()).get(
-						e2.getPetriNetNode())) {
+				if (this.sysReachMap.get(u.getPetriNetNode()).get(e2.getPetriNetNode())) {
 					lcpSet.add(u);
 					continue;
 				}
@@ -314,23 +298,19 @@ public class LeastCommonPredecessorsAndSuccessors {
 		queue.offer(e2);
 		while (!queue.isEmpty()) {
 			IBPNode u = queue.poll();
-			if (u instanceof Event
-					&& ((Event) u).getTransition() == e1.getTransition()) {
+			if (u instanceof Event && ((Event) u).getTransition() == e1.getTransition()) {
 				continue;
 			} else if (this._loopJoinConditions.contains(u)) {
 				// hasLoopPred2 = true;
-			} else if (u instanceof Condition
-					&& ((Condition) u).getPlace() == source) {
+			} else if (u instanceof Condition && ((Condition) u).getPlace() == source) {
 				hasSourcePred2 = true;
-				if (this.sysReachMap.get(u.getPetriNetNode()).get(
-						e1.getPetriNetNode())) {
+				if (this.sysReachMap.get(u.getPetriNetNode()).get(e1.getPetriNetNode())) {
 					lcpSet.add(u);
 				}
 			} else if (u instanceof Condition) {
 				Set<Condition> conditions = new HashSet<Condition>();
 				if (((Condition) u).getMappingConditions() != null) {
-					((Condition) u).getMappingConditions().stream()
-							.filter(c -> c.getPostE().isEmpty())
+					((Condition) u).getMappingConditions().stream().filter(c -> c.getPostE().isEmpty())
 							.forEach(conditions::add);
 				}
 				conditions.add((Condition) u);
@@ -338,16 +318,14 @@ public class LeastCommonPredecessorsAndSuccessors {
 					if (this._loopJoinConditions.contains(c)) {
 						continue;
 					}
-					if (this.sysReachMap.get(c.getPetriNetNode()).get(
-							e1.getPetriNetNode())) {
+					if (this.sysReachMap.get(c.getPetriNetNode()).get(e1.getPetriNetNode())) {
 						lcpSet.add(c);
 						continue;
 					}
 					queue.offer(c.getPreEvent());
 				}
 			} else {
-				if (this.sysReachMap.get(u.getPetriNetNode()).get(
-						e1.getPetriNetNode())) {
+				if (this.sysReachMap.get(u.getPetriNetNode()).get(e1.getPetriNetNode())) {
 					lcpSet.add(u);
 					continue;
 				}
@@ -396,13 +374,11 @@ public class LeastCommonPredecessorsAndSuccessors {
 			boolean filter = false;
 			while (it.hasNext()) {
 				IBPNode v = it.next();
-				if (this.sysReachMap.get(lcp.getPetriNetNode()).get(
-						v.getPetriNetNode())) {
+				if (this.sysReachMap.get(lcp.getPetriNetNode()).get(v.getPetriNetNode())) {
 					filter = true;
 					break;
 				}
-				if (this.sysReachMap.get(v.getPetriNetNode()).get(
-						lcp.getPetriNetNode())) {
+				if (this.sysReachMap.get(v.getPetriNetNode()).get(lcp.getPetriNetNode())) {
 					it.remove();
 				}
 			}
@@ -432,19 +408,17 @@ public class LeastCommonPredecessorsAndSuccessors {
 		queue.offer(e1);
 		while (!queue.isEmpty()) {
 			IBPNode u = queue.poll();
-			if (u instanceof Event
-					&& ((Event) u).getTransition() == e2.getTransition()) {
+			if (u instanceof Event && ((Event) u).getTransition() == e2.getTransition()) {
 				continue;
 			} else if (this._loopJoinConditions.contains(u)) {
 				// hasLoopSucc1 = true;
-			} else if (u instanceof Condition
-					&& ((Condition) u).getPlace() == sink) {
+			} else if (u instanceof Condition && ((Condition) u).getPlace() == sink) {
 				hasSinkSucc1 = true;
 				if (this.cpuReachMap.get(e2).get(u)) {
 					lcsSet.add(u);
 				}
-			} else if (u instanceof Condition && ((Condition) u).isCutoffPost()
-					&& ((Condition) u).getPostE().isEmpty()) {
+			} else
+				if (u instanceof Condition && ((Condition) u).isCutoffPost() && ((Condition) u).getPostE().isEmpty()) {
 				u = ((Condition) u).getCorrespondingCondition();
 				queue.offer(u);
 			} else {
@@ -470,19 +444,17 @@ public class LeastCommonPredecessorsAndSuccessors {
 		queue.offer(e2);
 		while (!queue.isEmpty()) {
 			IBPNode u = queue.poll();
-			if (u instanceof Event
-					&& ((Event) u).getTransition() == e1.getTransition()) {
+			if (u instanceof Event && ((Event) u).getTransition() == e1.getTransition()) {
 				continue;
 			} else if (this._loopJoinConditions.contains(u)) {
 				// hasLoopSucc2 = true;
-			} else if (u instanceof Condition
-					&& ((Condition) u).getPlace() == sink) {
+			} else if (u instanceof Condition && ((Condition) u).getPlace() == sink) {
 				hasSinkSucc2 = true;
 				if (this.cpuReachMap.get(e1).get(u)) {
 					lcsSet.add(u);
 				}
-			} else if (u instanceof Condition && ((Condition) u).isCutoffPost()
-					&& ((Condition) u).getPostE().isEmpty()) {
+			} else
+				if (u instanceof Condition && ((Condition) u).isCutoffPost() && ((Condition) u).getPostE().isEmpty()) {
 				u = ((Condition) u).getCorrespondingCondition();
 				queue.offer(u);
 			} else {
@@ -576,13 +548,11 @@ public class LeastCommonPredecessorsAndSuccessors {
 		queue.offer(e1);
 		while (!queue.isEmpty()) {
 			IBPNode u = queue.poll();
-			if (u instanceof Event
-					&& ((Event) u).getTransition() == e2.getTransition()) {
+			if (u instanceof Event && ((Event) u).getTransition() == e2.getTransition()) {
 				continue;
 			} else if (this._loopJoinConditions.contains(u)) {
 				// hasLoopPred1 = true;
-			} else if (u instanceof Condition
-					&& ((Condition) u).getPlace() == source) {
+			} else if (u instanceof Condition && ((Condition) u).getPlace() == source) {
 				hasSourcePred1 = true;
 				if (this.cpuReachMap.get(u).get(e2)) {
 					lcpSet.add(u);
@@ -590,10 +560,10 @@ public class LeastCommonPredecessorsAndSuccessors {
 			} else if (u instanceof Condition) {
 				Set<Condition> conditions = new HashSet<Condition>();
 				if (((Condition) u).getMappingConditions() != null) {
-					conditions.addAll(((Condition) u).getMappingConditions());
-				} else {
-					conditions.add((Condition) u);
+					((Condition) u).getMappingConditions().stream().filter(c -> c.getPostE().isEmpty())
+							.forEach(conditions::add);
 				}
+				conditions.add((Condition) u);
 				for (Condition c : conditions) {
 					if (this._loopJoinConditions.contains(c)) {
 						continue;
@@ -620,13 +590,11 @@ public class LeastCommonPredecessorsAndSuccessors {
 		queue.offer(e2);
 		while (!queue.isEmpty()) {
 			IBPNode u = queue.poll();
-			if (u instanceof Event
-					&& ((Event) u).getTransition() == e1.getTransition()) {
+			if (u instanceof Event && ((Event) u).getTransition() == e1.getTransition()) {
 				continue;
 			} else if (this._loopJoinConditions.contains(u)) {
 				// hasLoopPred2 = true;
-			} else if (u instanceof Condition
-					&& ((Condition) u).getPlace() == source) {
+			} else if (u instanceof Condition && ((Condition) u).getPlace() == source) {
 				hasSourcePred2 = true;
 				if (this.cpuReachMap.get(u).get(e1)) {
 					lcpSet.add(u);
@@ -634,8 +602,7 @@ public class LeastCommonPredecessorsAndSuccessors {
 			} else if (u instanceof Condition) {
 				Set<Condition> conditions = new HashSet<Condition>();
 				if (((Condition) u).getMappingConditions() != null) {
-					((Condition) u).getMappingConditions().stream()
-							.filter(c -> c.getPostE().isEmpty())
+					((Condition) u).getMappingConditions().stream().filter(c -> c.getPostE().isEmpty())
 							.forEach(conditions::add);
 				}
 				conditions.add((Condition) u);
@@ -729,10 +696,8 @@ public class LeastCommonPredecessorsAndSuccessors {
 		return loopJoinConditions;
 	}
 
-	private void dfsLoopJoin(IBPNode u, Set<INode> visited,
-			Set<Condition> loopJoinConditions) {
-		if (u instanceof Condition && visited.contains(u.getPetriNetNode())
-				&& ((Condition) u).isCutoffPost()
+	private void dfsLoopJoin(IBPNode u, Set<INode> visited, Set<Condition> loopJoinConditions) {
+		if (u instanceof Condition && visited.contains(u.getPetriNetNode()) && ((Condition) u).isCutoffPost()
 				&& ((Condition) u).getPostE().isEmpty()) {
 			loopJoinConditions.add((Condition) u);
 			return;
@@ -807,8 +772,7 @@ public class LeastCommonPredecessorsAndSuccessors {
 			trace.add(sinkCondition);
 			generateReachMap(trace);
 			trace.remove(trace.size() - 1);
-		} else if (u instanceof Condition && ((Condition) u).isCutoffPost()
-				&& ((Condition) u).getPostE().isEmpty()) {
+		} else if (u instanceof Condition && ((Condition) u).isCutoffPost() && ((Condition) u).getPostE().isEmpty()) {
 			u = ((Condition) u).getCorrespondingCondition();
 			dfsReachMap(u, trace, sink);
 		} else {
@@ -833,8 +797,7 @@ public class LeastCommonPredecessorsAndSuccessors {
 			IBPNode u = trace.get(i);
 			for (int j = i + 1; j < trace.size(); ++j) {
 				IBPNode v = trace.get(j);
-				this.sysReachMap.get(u.getPetriNetNode()).put(
-						v.getPetriNetNode(), true);
+				this.sysReachMap.get(u.getPetriNetNode()).put(v.getPetriNetNode(), true);
 				this.cpuReachMap.get(u).put(v, true);
 			}
 		}
