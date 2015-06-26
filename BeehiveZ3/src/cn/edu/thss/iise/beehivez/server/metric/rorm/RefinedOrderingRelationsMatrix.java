@@ -62,11 +62,11 @@ public class RefinedOrderingRelationsMatrix {
 		for (int i = 0; i < this.tName.size(); ++i) {
 			for (int j = 0; j < this.tName.size(); ++j) {
 				this.causalMatrix[i][j] = new RefinedOrderingRelation(
-						Relation.NEVER, false);
+						Relation.NEVER, false, 0);
 				this.inverseCausalMatrix[i][j] = new RefinedOrderingRelation(
-						Relation.NEVER, false);
+						Relation.NEVER, false, 0);
 				this.concurrentMatrix[i][j] = new RefinedOrderingRelation(
-						Relation.NEVER, false);
+						Relation.NEVER, false, 0);
 			}
 		}
 		generateCausalAndInverseCausalMatrix();
@@ -665,6 +665,17 @@ public class RefinedOrderingRelationsMatrix {
 							.getName(), new Double[2]);
 					this.importance.get(((Event) to).getTransition().getName())[1] = im;
 				}
+			}
+		}
+		for (int i = 0; i < tName.size(); ++i) {
+			for (int j = 0; j < tName.size(); ++j) {
+				String fromTransition = tName.get(i);
+				String toTransition = tName.get(j);
+				double coef = Math.min(this.importance.get(fromTransition)[0],
+						this.importance.get(toTransition)[1]);
+				this.causalMatrix[i][j].importance = coef;
+				this.inverseCausalMatrix[i][j].importance = coef;
+				this.concurrentMatrix[i][j].importance = coef;
 			}
 		}
 	}

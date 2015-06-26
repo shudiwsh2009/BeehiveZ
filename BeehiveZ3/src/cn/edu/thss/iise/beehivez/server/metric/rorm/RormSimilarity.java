@@ -28,51 +28,86 @@ public class RormSimilarity extends PetriNetSimilarity {
 		return similarity((PetriNet) pn1.clone(), (PetriNet) pn2.clone(), 1);
 	}
 
-	private float similarity(PetriNet pn1, PetriNet pn2, int internal) {
+	public float similarity(PetriNet pn1, PetriNet pn2, int internal) {
 		RefinedOrderingRelationsMatrix ecfm1 = new RefinedOrderingRelationsMatrix(
 				pn1);
 		RefinedOrderingRelationsMatrix ecfm2 = new RefinedOrderingRelationsMatrix(
 				pn2);
-		List<String> tName1 = ecfm1.gettName();
-		List<String> tName2 = ecfm2.gettName();
+		return similarity(ecfm1, ecfm2);
+	}
+
+	public float similarity(RefinedOrderingRelationsMatrix matrix1,
+			RefinedOrderingRelationsMatrix matrix2) {
+		List<String> tName1 = matrix1.gettName();
+		List<String> tName2 = matrix2.gettName();
 		List<String> interNames = new ArrayList<String>();
-		for (String s : tName1) {
-			if (tName2.contains(s)) {
-				interNames.add(s);
-			}
-		}
+		interNames.addAll(tName1);
+		interNames.retainAll(tName2);
 		Set<String> unionNames = new HashSet<String>();
 		unionNames.addAll(tName1);
 		unionNames.addAll(tName2);
-		int followInter = 0, precedeInter = 0, parallelInter = 0;
+		// intersection
+		double causalInter = 0.0, inverseCausalInter = 0.0, concurrentInter = 0.0;
 		for (int i = 0; i < interNames.size(); ++i) {
-			String row = interNames.get(i);
+			int idx1i = tName1.indexOf(interNames.get(i));
+			int idx2i = tName2.indexOf(interNames.get(i));
 			for (int j = 0; j < interNames.size(); ++j) {
-				String col = interNames.get(j);
-				if (ecfm1.getCausalMatrix()[tName1.indexOf(row)][tName1
-						.indexOf(col)].equals(ecfm2.getCausalMatrix()[tName2
-						.indexOf(row)][tName2.indexOf(col)])) {
-					++followInter;
-				}
-				if (ecfm1.getInverseCausalMatrix()[tName1.indexOf(row)][tName1
-						.indexOf(col)]
-						.equals(ecfm2.getInverseCausalMatrix()[tName2
-								.indexOf(row)][tName2.indexOf(col)])) {
-					++precedeInter;
-				}
-				if (ecfm1.getConcurrentMatrix()[tName1.indexOf(row)][tName1
-						.indexOf(col)]
-						.equals(ecfm2.getConcurrentMatrix()[tName2.indexOf(row)][tName2
-								.indexOf(col)])) {
-					++parallelInter;
+				int idx1j = tName1.indexOf(interNames.get(j));
+				int idx2j = tName2.indexOf(interNames.get(j));
+				causalInter += matrix1.getCausalMatrix()[idx1i][idx1j]
+						.intersection(matrix2.getCausalMatrix()[idx2i][idx2j]);
+				inverseCausalInter += matrix1.getInverseCausalMatrix()[idx1i][idx1j]
+						.intersection(matrix2.getCausalMatrix()[idx2i][idx2j]);
+				concurrentInter += matrix1.getConcurrentMatrix()[idx1i][idx1j]
+						.intersection(matrix2.getCausalMatrix()[idx2i][idx2j]);
+			}
+		}
+		// union
+		double causalUnion = 0.0, inverseCausalUnion = 0.0, concurrentUnion = 0.0;
+		for (int i = 0; i < tName1.size(); ++i) {
+			int idx2i = tName2.indexOf(tName1.get(i));
+			for (int j = 0; j < tName1.size(); ++j) {
+				int idx2j = tName2.indexOf(tName1.get(j));
+				if (idx2i != -1 && idx2j != -1) {
+					causalUnion += matrix1.getCausalMatrix()[i][j]
+							.union(matrix2.getCausalMatrix()[idx2i][idx2j]);
+					inverseCausalUnion += matrix1.getInverseCausalMatrix()[i][j]
+							.union(matrix2.getCausalMatrix()[idx2i][idx2j]);
+					concurrentUnion += matrix1.getConcurrentMatrix()[i][j]
+							.union(matrix2.getCausalMatrix()[idx2i][idx2j]);
+				} else {
+					causalUnion += matrix1.getCausalMatrix()[i][j].relation == Relation.NEVER ? 0
+							: matrix1.getCausalMatrix()[i][j].importance;
+					inverseCausalUnion += matrix1.getInverseCausalMatrix()[i][j].relation == Relation.NEVER ? 0
+							: matrix1.getInverseCausalMatrix()[i][j].importance;
+					concurrentUnion += matrix1.getConcurrentMatrix()[i][j].relation == Relation.NEVER ? 0
+							: matrix1.getConcurrentMatrix()[i][j].importance;
 				}
 			}
 		}
-		double followSim = followInter / Math.pow(unionNames.size(), 2);
-		double precedeSim = precedeInter / Math.pow(unionNames.size(), 2);
-		double parallelSim = parallelInter / Math.pow(unionNames.size(), 2);
-		System.out.println(followSim + " " + precedeSim + " " + parallelSim);
-		return (float) ((followSim + precedeSim + parallelSim) / 3);
+		for (int i = 0; i < tName2.size(); ++i) {
+			int idx1i = tName1.indexOf(tName2.get(i));
+			for (int j = 0; j < tName2.size(); ++j) {
+				int idx1j = tName1.indexOf(tName2.get(j));
+				if (idx1i != -1 && idx1j != -1) {
+					continue;
+				} else {
+					causalUnion += matrix2.getCausalMatrix()[i][j].relation == Relation.NEVER ? 0
+							: matrix2.getCausalMatrix()[i][j].importance;
+					inverseCausalUnion += matrix2.getInverseCausalMatrix()[i][j].relation == Relation.NEVER ? 0
+							: matrix2.getInverseCausalMatrix()[i][j].importance;
+					concurrentUnion += matrix2.getConcurrentMatrix()[i][j].relation == Relation.NEVER ? 0
+							: matrix2.getConcurrentMatrix()[i][j].importance;
+				}
+			}
+		}
+		// Jaccard
+		double causalSim = causalInter / causalUnion;
+		double inverseCausalSim = inverseCausalInter / inverseCausalUnion;
+		double concurrentSim = concurrentInter / concurrentUnion;
+		System.out.println(causalSim + " " + inverseCausalSim + " "
+				+ concurrentSim);
+		return (float) ((causalSim + inverseCausalSim + concurrentSim) / 3);
 	}
 
 	public float similarity(PetriNet pn1, PetriNet pn2, Map<String, String> corr) {
