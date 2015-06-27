@@ -59,13 +59,14 @@ public class RormSimilarity extends PetriNetSimilarity {
 				causalInter += matrix1.getCausalMatrix()[idx1i][idx1j]
 						.intersection(matrix2.getCausalMatrix()[idx2i][idx2j]);
 				inverseCausalInter += matrix1.getInverseCausalMatrix()[idx1i][idx1j]
-						.intersection(matrix2.getCausalMatrix()[idx2i][idx2j]);
+						.intersection(matrix2.getInverseCausalMatrix()[idx2i][idx2j]);
 				concurrentInter += matrix1.getConcurrentMatrix()[idx1i][idx1j]
-						.intersection(matrix2.getCausalMatrix()[idx2i][idx2j]);
+						.intersection(matrix2.getConcurrentMatrix()[idx2i][idx2j]);
 			}
 		}
 		// union
 		double causalUnion = 0.0, inverseCausalUnion = 0.0, concurrentUnion = 0.0;
+		int causalUnionSize = 0, inverseCausalUnionSize = 0, concurrentUnionSize = 0;
 		for (int i = 0; i < tName1.size(); ++i) {
 			int idx2i = tName2.indexOf(tName1.get(i));
 			for (int j = 0; j < tName1.size(); ++j) {
@@ -73,9 +74,21 @@ public class RormSimilarity extends PetriNetSimilarity {
 				if (idx2i != -1 && idx2j != -1) {
 					causalUnion += matrix1.getCausalMatrix()[i][j].union(matrix2.getCausalMatrix()[idx2i][idx2j]);
 					inverseCausalUnion += matrix1.getInverseCausalMatrix()[i][j]
-							.union(matrix2.getCausalMatrix()[idx2i][idx2j]);
+							.union(matrix2.getInverseCausalMatrix()[idx2i][idx2j]);
 					concurrentUnion += matrix1.getConcurrentMatrix()[i][j]
-							.union(matrix2.getCausalMatrix()[idx2i][idx2j]);
+							.union(matrix2.getConcurrentMatrix()[idx2i][idx2j]);
+					if (matrix1.getCausalMatrix()[i][j].relation != Relation.NEVER
+							|| matrix2.getCausalMatrix()[idx2i][idx2j].relation != Relation.NEVER) {
+						++causalUnionSize;
+					}
+					if (matrix1.getInverseCausalMatrix()[i][j].relation != Relation.NEVER
+							|| matrix2.getInverseCausalMatrix()[idx2i][idx2j].relation != Relation.NEVER) {
+						++inverseCausalUnionSize;
+					}
+					if (matrix1.getConcurrentMatrix()[i][j].relation != Relation.NEVER
+							|| matrix2.getConcurrentMatrix()[idx2i][idx2j].relation != Relation.NEVER) {
+						++concurrentUnionSize;
+					}
 				} else {
 					causalUnion += matrix1.getCausalMatrix()[i][j].relation == Relation.NEVER ? 0
 							: matrix1.getCausalMatrix()[i][j].importance;
@@ -83,6 +96,9 @@ public class RormSimilarity extends PetriNetSimilarity {
 							: matrix1.getInverseCausalMatrix()[i][j].importance;
 					concurrentUnion += matrix1.getConcurrentMatrix()[i][j].relation == Relation.NEVER ? 0
 							: matrix1.getConcurrentMatrix()[i][j].importance;
+					causalUnionSize += matrix1.getCausalMatrix()[i][j].relation == Relation.NEVER ? 0 : 1;
+					inverseCausalUnionSize += matrix1.getInverseCausalMatrix()[i][j].relation == Relation.NEVER ? 0 : 1;
+					concurrentUnionSize += matrix1.getConcurrentMatrix()[i][j].relation == Relation.NEVER ? 0 : 1;
 				}
 			}
 		}
@@ -99,15 +115,23 @@ public class RormSimilarity extends PetriNetSimilarity {
 							: matrix2.getInverseCausalMatrix()[i][j].importance;
 					concurrentUnion += matrix2.getConcurrentMatrix()[i][j].relation == Relation.NEVER ? 0
 							: matrix2.getConcurrentMatrix()[i][j].importance;
+					causalUnionSize += matrix2.getCausalMatrix()[i][j].relation == Relation.NEVER ? 0 : 1;
+					inverseCausalUnionSize += matrix2.getInverseCausalMatrix()[i][j].relation == Relation.NEVER ? 0 : 1;
+					concurrentUnionSize += matrix2.getConcurrentMatrix()[i][j].relation == Relation.NEVER ? 0 : 1;
 				}
 			}
 		}
 		// Jaccard
-		double causalSim = causalInter / causalUnion;
-		double inverseCausalSim = inverseCausalInter / inverseCausalUnion;
-		double concurrentSim = concurrentInter / concurrentUnion;
+		double causalSim = causalUnion == 0 ? 0 : causalInter / causalUnion;
+		double inverseCausalSim = inverseCausalUnion == 0 ? 0 : inverseCausalInter / inverseCausalUnion;
+		double concurrentSim = concurrentUnion == 0 ? 0 : concurrentInter / concurrentUnion;
+		int unionSize = causalUnionSize + inverseCausalUnionSize + concurrentUnionSize;
+		double causalWeight = ((double) causalUnionSize) / ((double) unionSize);
+		double inverseCausalWeight = ((double) inverseCausalUnionSize) / ((double) unionSize);
+		double concurrentWeight = ((double) concurrentUnionSize) / ((double) unionSize);
 		System.out.println(causalSim + " " + inverseCausalSim + " " + concurrentSim);
-		return (float) ((causalSim + inverseCausalSim + concurrentSim) / 3);
+		return (float) (causalSim * causalWeight + inverseCausalSim * inverseCausalWeight
+				+ concurrentSim * concurrentWeight);
 	}
 
 	public float similarity(PetriNet pn1, PetriNet pn2, Map<String, String> corr) {
@@ -145,11 +169,13 @@ public class RormSimilarity extends PetriNetSimilarity {
 		// "/Users/shudi/Desktop/parallel_A_with_outer_loop.pnml";
 		// String filePath = "/Users/shudi/Desktop/M15.pnml";
 
-		PNMLSerializer pnmlSerializer = new PNMLSerializer();
-		String filePath = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\DMKD07_M5.pnml";
-		NetSystem net = pnmlSerializer.parse(filePath);
-		RefinedOrderingRelationsMatrix rorm = new RefinedOrderingRelationsMatrix(net);
-		rorm.printMatrix();
+		// PNMLSerializer pnmlSerializer = new PNMLSerializer();
+		// String filePath =
+		// "C:\\Users\\Shudi\\Desktop\\rorm\\test\\DMKD07_M5.pnml";
+		// NetSystem net = pnmlSerializer.parse(filePath);
+		// RefinedOrderingRelationsMatrix rorm = new
+		// RefinedOrderingRelationsMatrix(net);
+		// rorm.printMatrix();
 
 		// String filepath1 =
 		// "C:\\Users\\Shudi\\Desktop\\rorm\\test\\parallel_inv_1_a.pnml";
@@ -162,14 +188,12 @@ public class RormSimilarity extends PetriNetSimilarity {
 		// PetriNetSimilarity sim = new RormSimilarity();
 		// System.out.println(sim.similarity(pn1, pn2));
 
-		// PNMLSerializer pnmlSerializer = new PNMLSerializer();
-		// String filepath1 =
-		// "C:\\Users\\Shudi\\Desktop\\rorm\\test\\parallel_inv_1_a.pnml";
-		// String filepath2 =
-		// "C:\\Users\\Shudi\\Desktop\\rorm\\test\\parallel_inv_1_b.pnml";
-		// NetSystem net1 = pnmlSerializer.parse(filepath1);
-		// NetSystem net2 = pnmlSerializer.parse(filepath2);
-		// RormSimilarity sim = new RormSimilarity();
-		// System.out.println(sim.similarity(net1, net2));
+		PNMLSerializer pnmlSerializer = new PNMLSerializer();
+		String filepath1 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\M0.pnml";
+		String filepath2 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\M1.pnml";
+		NetSystem net1 = pnmlSerializer.parse(filepath1);
+		NetSystem net2 = pnmlSerializer.parse(filepath2);
+		RormSimilarity sim = new RormSimilarity();
+		System.out.println(sim.similarity(net1, net2));
 	}
 }
