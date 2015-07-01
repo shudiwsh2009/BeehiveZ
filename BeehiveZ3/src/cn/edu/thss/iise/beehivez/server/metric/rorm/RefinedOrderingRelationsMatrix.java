@@ -391,9 +391,6 @@ public class RefinedOrderingRelationsMatrix {
 	}
 
 	private boolean[] hasSometimesConcurrent(Event a, Event b, Event lcp) {
-		if(a.getTransition().getName().equals("A") && b.getTransition().getName().equals("E")) {
-			System.out.println();
-		}
 		boolean aHasSometimesConcurrent = false;
 		boolean bHasSometimesConcurrent = false;
 		Place sourcePlace = this._sys.getSourcePlaces().iterator().next();
