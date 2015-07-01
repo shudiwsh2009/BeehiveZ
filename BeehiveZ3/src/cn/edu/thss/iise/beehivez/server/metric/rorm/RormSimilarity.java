@@ -169,13 +169,13 @@ public class RormSimilarity extends PetriNetSimilarity {
 		// "/Users/shudi/Desktop/parallel_A_with_outer_loop.pnml";
 		// String filePath = "/Users/shudi/Desktop/M15.pnml";
 
-		// PNMLSerializer pnmlSerializer = new PNMLSerializer();
-		// String filePath =
-		// "C:\\Users\\Shudi\\Desktop\\rorm\\test\\DMKD07_M5.pnml";
-		// NetSystem net = pnmlSerializer.parse(filePath);
-		// RefinedOrderingRelationsMatrix rorm = new
-		// RefinedOrderingRelationsMatrix(net);
-		// rorm.printMatrix();
+		 PNMLSerializer pnmlSerializer = new PNMLSerializer();
+		 String filePath =
+		 "C:\\Users\\Shudi\\Desktop\\rorm\\test\\example_petri.pnml";
+		 NetSystem net = pnmlSerializer.parse(filePath);
+		 RefinedOrderingRelationsMatrix rorm = new
+		 RefinedOrderingRelationsMatrix(net);
+		 rorm.printMatrix();
 
 		// String filepath1 =
 		// "C:\\Users\\Shudi\\Desktop\\rorm\\test\\parallel_inv_1_a.pnml";
@@ -188,12 +188,12 @@ public class RormSimilarity extends PetriNetSimilarity {
 		// PetriNetSimilarity sim = new RormSimilarity();
 		// System.out.println(sim.similarity(pn1, pn2));
 
-		PNMLSerializer pnmlSerializer = new PNMLSerializer();
-		String filepath1 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\M0.pnml";
-		String filepath2 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\M1.pnml";
-		NetSystem net1 = pnmlSerializer.parse(filepath1);
-		NetSystem net2 = pnmlSerializer.parse(filepath2);
-		RormSimilarity sim = new RormSimilarity();
-		System.out.println(sim.similarity(net1, net2));
+//		PNMLSerializer pnmlSerializer = new PNMLSerializer();
+//		String filepath1 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\M0.pnml";
+//		String filepath2 = "C:\\Users\\Shudi\\Desktop\\rorm\\test\\M1.pnml";
+//		NetSystem net1 = pnmlSerializer.parse(filepath1);
+//		NetSystem net2 = pnmlSerializer.parse(filepath2);
+//		RormSimilarity sim = new RormSimilarity();
+//		System.out.println(sim.similarity(net1, net2));
 	}
 }

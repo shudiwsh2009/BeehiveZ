@@ -391,6 +391,9 @@ public class RefinedOrderingRelationsMatrix {
 	}
 
 	private boolean[] hasSometimesConcurrent(Event a, Event b, Event lcp) {
+		if(a.getTransition().getName().equals("A") && b.getTransition().getName().equals("E")) {
+			System.out.println();
+		}
 		boolean aHasSometimesConcurrent = false;
 		boolean bHasSometimesConcurrent = false;
 		Place sourcePlace = this._sys.getSourcePlaces().iterator().next();
@@ -496,21 +499,13 @@ public class RefinedOrderingRelationsMatrix {
 			Iterator<IBPNode> itBj = bSkipSplits.iterator();
 			while (itBj.hasNext() && (!aHasSometimesConcurrent || !bHasSometimesConcurrent)) {
 				IBPNode bj = itBj.next();
-				Set<IBPNode> _lcsSet = this._lc.getLcsCpuMap().get(ai).get(bj);
-				boolean hasConditionLcs = false;
-				for (IBPNode _lcs : _lcsSet) {
-					if (_lcs instanceof Event && this._lc.getCpuReachMap().get(ai).get(_lcs)
-							&& this._lc.getCpuReachMap().get(bj).get(_lcs)) {
-						aHasSometimesConcurrent = true;
-						bHasSometimesConcurrent = true;
-						return new boolean[] { true, true };
-					} else if (_lcs instanceof Condition) {
-						hasConditionLcs = true;
-					}
-				}
-				if (!hasConditionLcs) {
+				if (ai == bj) {
 					itAi.remove();
 					itBj.remove();
+				} else {
+					aHasSometimesConcurrent = true;
+					bHasSometimesConcurrent = true;
+					return new boolean[] {true, true};
 				}
 			}
 		}
