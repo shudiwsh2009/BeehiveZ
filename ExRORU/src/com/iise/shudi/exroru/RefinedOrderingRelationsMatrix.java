@@ -693,7 +693,7 @@ public class RefinedOrderingRelationsMatrix {
 
     private void initialiseNetSystem(NetSystem net) {
         net.getNodes().forEach(n -> n.setName(n.getLabel()));
-        net.getTransitions().stream().filter(t -> t.getLabel().startsWith("inv_")).forEach(t -> t.setLabel(""));
+        net.getTransitions().stream().filter(t -> t.getLabel().toLowerCase().startsWith("inv_")).forEach(t -> t.setLabel(""));
         for (Place p : net.getPlaces()) {
             if (net.getIncomingEdges(p).isEmpty()) {
                 net.getMarking().put(p, 1);

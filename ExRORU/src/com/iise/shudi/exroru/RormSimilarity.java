@@ -24,7 +24,7 @@ public class RormSimilarity {
 
         PNMLSerializer pnmlSerializer = new PNMLSerializer();
         String filePath =
-                "C:\\Users\\Shudi\\Desktop\\rorm\\test\\example_petri.pnml";
+                "C:\\Users\\Shudi\\Desktop\\rorm\\test\\parallel_inv_1_a.pnml";
         NetSystem net = pnmlSerializer.parse(filePath);
         RefinedOrderingRelationsMatrix rorm = new
                 RefinedOrderingRelationsMatrix(net);
