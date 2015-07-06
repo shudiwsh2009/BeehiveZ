@@ -29,9 +29,9 @@ public class RefinedOrderingRelation {
     public double union(RefinedOrderingRelation r) {
         if (relation == Relation.NEVER && r.relation == Relation.NEVER) {
             return 0;
-        } else if (relation == Relation.NEVER && r.relation != Relation.NEVER) {
+        } else if (relation == Relation.NEVER) {
             return r.importance;
-        } else if (relation != Relation.NEVER && r.relation == Relation.NEVER) {
+        } else if (r.relation == Relation.NEVER) {
             return importance;
         } else {
             return Math.max(importance, r.importance);
@@ -49,7 +49,7 @@ public class RefinedOrderingRelation {
     }
 
     public String toString() {
-        String s = "";
+        String s;
         switch (relation) {
             case ALWAYS:
                 s = "A";
@@ -65,7 +65,6 @@ public class RefinedOrderingRelation {
                 break;
         }
         return s;
-
     }
 
 }
