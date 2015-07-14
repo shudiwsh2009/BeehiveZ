@@ -230,7 +230,7 @@ public class ConcurrencyRelation {
         Set<NodePair> concNodes = new HashSet<NodePair>();
 
 		/*
-		 * Initialization of the algorithm
+         * Initialization of the algorithm
 		 */
         List<Node> initialPlaces = new ArrayList<Node>(this.sys.getMarkedPlaces());
         setAllNodesConcurrent(initialPlaces);

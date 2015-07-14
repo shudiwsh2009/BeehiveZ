@@ -83,7 +83,7 @@ public class AbstractEdge<V extends IVertex> extends AbstractHyperEdge<V> implem
     }
 
 	/*
-	 * (non-Javadoc)
+     * (non-Javadoc)
 	 * @see de.hpi.bpt.hypergraph.abs.AbstractHyperEdge#equals(java.lang.Object)
 	 */
 	/*@SuppressWarnings("unchecked")

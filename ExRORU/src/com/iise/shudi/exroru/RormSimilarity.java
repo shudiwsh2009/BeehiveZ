@@ -37,9 +37,9 @@ public class RormSimilarity {
     }
 
     public float similarity(NetSystem net1, NetSystem net2) {
-        RefinedOrderingRelationsMatrix ecfm1 = new RefinedOrderingRelationsMatrix(net1);
-        RefinedOrderingRelationsMatrix ecfm2 = new RefinedOrderingRelationsMatrix(net2);
-        return similarityWithNever(ecfm1, ecfm2);
+        RefinedOrderingRelationsMatrix rorm1 = new RefinedOrderingRelationsMatrix(net1);
+        RefinedOrderingRelationsMatrix rorm2 = new RefinedOrderingRelationsMatrix(net2);
+        return similarityWithNever(rorm1, rorm2);
     }
 
     public float similarityWithoutNever(RefinedOrderingRelationsMatrix matrix1, RefinedOrderingRelationsMatrix matrix2) {

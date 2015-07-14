@@ -27,10 +27,6 @@ public class Branch {
         return cur;
     }
 
-    public void setCur(IBPNode cur) {
-        this.cur = cur;
-    }
-
     public RealVector getInEdges() {
         return inEdges;
     }
@@ -49,9 +45,5 @@ public class Branch {
 
     public boolean isMerged() {
         return merged;
-    }
-
-    public void setMerged(boolean merged) {
-        this.merged = merged;
     }
 }

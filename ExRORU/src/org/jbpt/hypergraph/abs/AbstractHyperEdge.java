@@ -172,7 +172,7 @@ public class AbstractHyperEdge<V extends IVertex> extends GObject implements IHy
     }
 
 	/*
-	 * (non-Javadoc)
+     * (non-Javadoc)
 	 * @see de.hpi.bpt.hypergraph.abs.GObject#equals(java.lang.Object)
 	 */
 	/*@SuppressWarnings("unchecked")

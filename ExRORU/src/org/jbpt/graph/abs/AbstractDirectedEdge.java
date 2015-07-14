@@ -135,7 +135,7 @@ public class AbstractDirectedEdge<V extends IVertex> extends AbstractDirectedHyp
     }
 
 	/*
-	 * (non-Javadoc)
+     * (non-Javadoc)
 	 * @see de.hpi.bpt.hypergraph.abs.AbstractDirectedHyperEdge#equals(java.lang.Object)
 	 */
 	/*@SuppressWarnings("unchecked")

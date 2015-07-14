@@ -44,7 +44,7 @@ public class Completion {
      * @assumption A given net is acyclic.
      * @assumption A given net is sound.
      *//*
-	public void completeSinks(NetSystem sys) {
+    public void completeSinks(NetSystem sys) {
 		TransitiveClosure<AbstractFlow,Node> tc = new TransitiveClosure<AbstractFlow,Node>(sys);
 		Map<Place,Set<Place>> p2ps = new HashMap<Place,Set<Place>>();
 		Map<Place,Set<Transition>> p2ts = new HashMap<Place,Set<Transition>>();

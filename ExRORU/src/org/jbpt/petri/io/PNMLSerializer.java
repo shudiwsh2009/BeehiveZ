@@ -261,7 +261,7 @@ public class PNMLSerializer extends DefaultHandler {
      */
     private NetSystem parseContent(String file, byte[] pnmlContent) {
         /*
-		 * Clear internal data structures
+         * Clear internal data structures
 		 */
         clear();
 

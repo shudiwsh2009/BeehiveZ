@@ -25,12 +25,14 @@ public class DotSerializer {
     private NodeDecorator nodeDecorator;
     private EdgeDecorator edgeDecorator;
     private GraphDecorator graphDecorator;
+
     public DotSerializer() {
         setGraphDecorator(new DefaultGraphDecorator());
         setEdgeDecorator(new DefaultEdgeDecorator());
         setNodeDecorator(new DefaultNodeDecorator());
         setRankDir(RankDir.TD);
     }
+
     /**
      * Modify the ouput of the DotSerializer any of these callback classes.
      *

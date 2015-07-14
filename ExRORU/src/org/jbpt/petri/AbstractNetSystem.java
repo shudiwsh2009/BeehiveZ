@@ -92,7 +92,7 @@ public abstract class AbstractNetSystem<F extends IFlow<N>, N extends INode, P e
     public Set<T> getEnabledTransitions(Set<T> lastEnabled, T lastFired) {
         Set<T> enabled = new HashSet<T>(lastEnabled);
         /*
-		 * Old disabled?
+         * Old disabled?
 		 */
         for (T t : lastEnabled) {
             if (!this.getMarkedPlaces().containsAll(this.getPreset(t)))
