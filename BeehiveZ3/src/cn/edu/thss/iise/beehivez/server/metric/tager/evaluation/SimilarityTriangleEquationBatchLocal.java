@@ -17,7 +17,6 @@ import cn.edu.thss.iise.beehivez.server.metric.ExtensiveTARSimilarity;
 import cn.edu.thss.iise.beehivez.server.metric.PetriNetSimilarity;
 import cn.edu.thss.iise.beehivez.server.metric.bp.BehavioralProfileSimilarity;
 import cn.edu.thss.iise.beehivez.server.metric.cfs.CFSSimilarity;
-import cn.edu.thss.iise.beehivez.server.metric.rorm.RormSimilarity;
 import cn.edu.thss.iise.beehivez.server.metric.ssdt.SSDTSimilarity;
 import cn.edu.thss.iise.beehivez.server.metric.tager.TagerCGSimilarity;
 import cn.edu.thss.iise.beehivez.server.metric.tager.ged.graph.TLabeledGraph;
