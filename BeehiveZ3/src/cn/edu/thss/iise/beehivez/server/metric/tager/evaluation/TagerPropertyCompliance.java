@@ -19,7 +19,6 @@ import cn.edu.thss.iise.beehivez.server.metric.JaccardTARSimilarity;
 import cn.edu.thss.iise.beehivez.server.metric.PetriNetSimilarity;
 import cn.edu.thss.iise.beehivez.server.metric.bp.BehavioralProfileSimilarity;
 import cn.edu.thss.iise.beehivez.server.metric.cfs.CFSSimilarity;
-import cn.edu.thss.iise.beehivez.server.metric.rorm.RormSimilarity;
 import cn.edu.thss.iise.beehivez.server.metric.ssdt.SSDTSimilarity;
 import cn.edu.thss.iise.beehivez.server.metric.tager.TagerCGSimilarity;
 
@@ -38,7 +37,6 @@ public class TagerPropertyCompliance {
 		hmMeasure.put("BP", new BehavioralProfileSimilarity());
 		hmMeasure.put("CF", new CausalFootprintSimilarity());
 		hmMeasure.put("CFS", new CFSSimilarity());
-		hmMeasure.put("RORM", new RormSimilarity());
 		hmMeasure.put("TAGER", new TagerCGSimilarity());
 	}
 

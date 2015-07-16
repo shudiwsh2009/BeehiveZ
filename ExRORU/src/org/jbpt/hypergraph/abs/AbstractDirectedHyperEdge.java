@@ -359,7 +359,7 @@ public class AbstractDirectedHyperEdge<V extends IVertex> extends AbstractHyperE
     }
 
 	/*
-	 * (non-Javadoc)
+     * (non-Javadoc)
 	 * @see de.hpi.bpt.hypergraph.abs.AbstractHyperEdge#equals(java.lang.Object)
 	 */
 	/*@SuppressWarnings("unchecked")

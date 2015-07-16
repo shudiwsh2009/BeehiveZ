@@ -29,7 +29,7 @@ public class ProjectedStateSpace<F extends IFlow<N>, N extends INode, P extends 
         this.projectionSetForStepMatrix = new HashMap<T, Integer>();
 
 		/*
-		 * All transitions in the projection set get an id
+         * All transitions in the projection set get an id
 		 * for the step matrix
 		 */
         List<T> tmpList = new ArrayList<T>(projectionSet);

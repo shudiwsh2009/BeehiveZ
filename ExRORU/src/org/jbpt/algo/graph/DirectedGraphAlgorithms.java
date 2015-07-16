@@ -156,7 +156,7 @@ public class DirectedGraphAlgorithms<E extends IDirectedEdge<V>, V extends IVert
         boolean changed = true;
 
 		/*
-		 * While we change the dom relation for a node
+         * While we change the dom relation for a node
 		 */
         while (changed) {
             changed = false;

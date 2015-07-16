@@ -14,6 +14,7 @@ public class AbstractUntanglingRun<F extends IFlow<N>, N extends INode, P extend
     HashMap<IStep<F, N, P, T, M>, Integer> s2p = new HashMap<IStep<F, N, P, T, M>, Integer>();
     HashMap<Interval, Set<IStep<F, N, P, T, M>>> i2s = new HashMap<Interval, Set<IStep<F, N, P, T, M>>>();
     boolean isSignificant = true;
+
     public AbstractUntanglingRun() {
         super();
     }

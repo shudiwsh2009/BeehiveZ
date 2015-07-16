@@ -25,7 +25,7 @@ public class TransitiveClosure<E extends IDirectedEdge<V>, V extends IVertex> {
         matrix = new boolean[this.verticesAsList.size()][this.verticesAsList.size()];
 
 		/*
-		 * Init matrix with edges
+         * Init matrix with edges
 		 */
         for (E e : this.g.getEdges()) {
             int source = this.verticesAsList.indexOf(e.getSource());

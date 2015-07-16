@@ -3,7 +3,6 @@ package com.iise.shudi.exroru.dependency.lc;
 import org.jbpt.petri.INode;
 import org.jbpt.petri.NetSystem;
 import org.jbpt.petri.Place;
-import org.jbpt.petri.Transition;
 import org.jbpt.petri.unfolding.CompletePrefixUnfolding;
 import org.jbpt.petri.unfolding.Condition;
 import org.jbpt.petri.unfolding.Event;
@@ -21,15 +20,15 @@ public class LeastCommonPredecessorsAndSuccessors {
     private Map<IBPNode, Map<IBPNode, Boolean>> cpuReachMap;
 
     // lcp and lcs based on sysReachMap
-    private Map<IBPNode, Map<IBPNode, Set<IBPNode>>> lcpSysMap = new HashMap<IBPNode, Map<IBPNode, Set<IBPNode>>>();
-    private Map<IBPNode, Map<IBPNode, Set<IBPNode>>> lcsSysMap = new HashMap<IBPNode, Map<IBPNode, Set<IBPNode>>>();
-    private Map<IBPNode, Map<IBPNode, Boolean>> forwardSysSkip = new HashMap<IBPNode, Map<IBPNode, Boolean>>();
-    private Map<IBPNode, Map<IBPNode, Boolean>> backwardSysSkip = new HashMap<IBPNode, Map<IBPNode, Boolean>>();
+    private Map<IBPNode, Map<IBPNode, Set<IBPNode>>> lcpSysMap = new HashMap<>();
+    private Map<IBPNode, Map<IBPNode, Set<IBPNode>>> lcsSysMap = new HashMap<>();
+    private Map<IBPNode, Map<IBPNode, Boolean>> forwardSysSkip = new HashMap<>();
+    private Map<IBPNode, Map<IBPNode, Boolean>> backwardSysSkip = new HashMap<>();
     // lcp and lcs based on cpuReachmap
-    private Map<IBPNode, Map<IBPNode, Set<IBPNode>>> lcpCpuMap = new HashMap<IBPNode, Map<IBPNode, Set<IBPNode>>>();
-    private Map<IBPNode, Map<IBPNode, Set<IBPNode>>> lcsCpuMap = new HashMap<IBPNode, Map<IBPNode, Set<IBPNode>>>();
-    private Map<IBPNode, Map<IBPNode, Boolean>> forwardCpuSkip = new HashMap<IBPNode, Map<IBPNode, Boolean>>();
-    private Map<IBPNode, Map<IBPNode, Boolean>> backwardCpuSkip = new HashMap<IBPNode, Map<IBPNode, Boolean>>();
+    private Map<IBPNode, Map<IBPNode, Set<IBPNode>>> lcpCpuMap = new HashMap<>();
+    private Map<IBPNode, Map<IBPNode, Set<IBPNode>>> lcsCpuMap = new HashMap<>();
+    private Map<IBPNode, Map<IBPNode, Boolean>> forwardCpuSkip = new HashMap<>();
+    private Map<IBPNode, Map<IBPNode, Boolean>> backwardCpuSkip = new HashMap<>();
 
     public LeastCommonPredecessorsAndSuccessors(CompletePrefixUnfolding cpu) {
         this._cpu = cpu;
@@ -37,31 +36,26 @@ public class LeastCommonPredecessorsAndSuccessors {
         this._loopJoinConditions = getLoopJoinConditions();
         initReachMap();
 
-        List<IBPNode> vertices = new ArrayList<IBPNode>();
-        for (Event e : this._cpu.getEvents()) {
-            vertices.add((IBPNode) e);
-        }
-        for (Condition c : this._cpu.getConditions()) {
-            vertices.add((IBPNode) c);
-        }
+        List<IBPNode> vertices = new ArrayList<>();
+        vertices.addAll(this._cpu.getEvents());
+        vertices.addAll(this._cpu.getConditions());
         for (int i = 0; i < vertices.size(); ++i) {
             IBPNode u = vertices.get(i);
-            this.lcpSysMap.put(u, new HashMap<IBPNode, Set<IBPNode>>());
-            this.lcsSysMap.put(u, new HashMap<IBPNode, Set<IBPNode>>());
-            this.forwardSysSkip.put(u, new HashMap<IBPNode, Boolean>());
-            this.backwardSysSkip.put(u, new HashMap<IBPNode, Boolean>());
-            this.lcpCpuMap.put(u, new HashMap<IBPNode, Set<IBPNode>>());
-            this.lcsCpuMap.put(u, new HashMap<IBPNode, Set<IBPNode>>());
-            this.forwardCpuSkip.put(u, new HashMap<IBPNode, Boolean>());
-            this.backwardCpuSkip.put(u, new HashMap<IBPNode, Boolean>());
-            for (int j = 0; j < vertices.size(); ++j) {
-                IBPNode v = vertices.get(j);
-                this.lcpSysMap.get(u).put(v, new HashSet<IBPNode>());
-                this.lcsSysMap.get(u).put(v, new HashSet<IBPNode>());
+            this.lcpSysMap.put(u, new HashMap<>());
+            this.lcsSysMap.put(u, new HashMap<>());
+            this.forwardSysSkip.put(u, new HashMap<>());
+            this.backwardSysSkip.put(u, new HashMap<>());
+            this.lcpCpuMap.put(u, new HashMap<>());
+            this.lcsCpuMap.put(u, new HashMap<>());
+            this.forwardCpuSkip.put(u, new HashMap<>());
+            this.backwardCpuSkip.put(u, new HashMap<>());
+            for (IBPNode v : vertices) {
+                this.lcpSysMap.get(u).put(v, new HashSet<>());
+                this.lcsSysMap.get(u).put(v, new HashSet<>());
                 this.forwardSysSkip.get(u).put(v, false);
                 this.backwardSysSkip.get(u).put(v, false);
-                this.lcpCpuMap.get(u).put(v, new HashSet<IBPNode>());
-                this.lcsCpuMap.get(u).put(v, new HashSet<IBPNode>());
+                this.lcpCpuMap.get(u).put(v, new HashSet<>());
+                this.lcsCpuMap.get(u).put(v, new HashSet<>());
                 this.forwardCpuSkip.get(u).put(v, false);
                 this.backwardCpuSkip.get(u).put(v, false);
             }
@@ -70,7 +64,7 @@ public class LeastCommonPredecessorsAndSuccessors {
     }
 
     private void generateLcpAndLcsMap() {
-        List<Event> events = new ArrayList<Event>(this._cpu.getEvents());
+        List<Event> events = new ArrayList<>(this._cpu.getEvents());
         for (int i = 0; i < events.size(); ++i) {
             Event e1 = events.get(i);
             for (int j = i + 1; j < events.size(); ++j) {
@@ -93,25 +87,22 @@ public class LeastCommonPredecessorsAndSuccessors {
 
     /**
      * used to check if e1 skips e2 and if e2 skips e1, forwards
-     *
-     * @param e1
-     * @param e2
-     * @return
      */
     private boolean[] hasSkipForwardSys(Event e1, Event e2) {
-        Set<IBPNode> lcsSet = new HashSet<IBPNode>();
+        Set<IBPNode> lcsSet = new HashSet<>();
         boolean hasSinkSucc1 = false, hasSinkSucc2 = false;
         // boolean hasLoopSucc1 = false, hasLoopSucc2 = false;
         Place sink = this._sys.getSinkPlaces().iterator().next();
         // step e1
-        Queue<IBPNode> queue = new LinkedList<IBPNode>();
+        Queue<IBPNode> queue = new LinkedList<>();
         queue.offer(e1);
         while (!queue.isEmpty()) {
             IBPNode u = queue.poll();
             if (u instanceof Event && ((Event) u).getTransition() == e2.getTransition()) {
-                continue;
-            } else if (this._loopJoinConditions.contains(u)) {
+                System.out.print("");
+            } else if (u instanceof Condition && this._loopJoinConditions.contains(u)) {
                 // hasLoopSucc1 = true;
+                System.out.print("");
             } else if (u instanceof Condition && ((Condition) u).getPlace() == sink) {
                 hasSinkSucc1 = true;
                 if (this.sysReachMap.get(e2.getPetriNetNode()).get(u.getPetriNetNode())) {
@@ -126,15 +117,9 @@ public class LeastCommonPredecessorsAndSuccessors {
                     continue;
                 }
                 if (u instanceof Condition) {
-                    Set<Event> uSuccSet = ((Condition) u).getPostE();
-                    for (Event uSucc : uSuccSet) {
-                        queue.offer(uSucc);
-                    }
+                    ((Condition) u).getPostE().forEach(queue::offer);
                 } else if (u instanceof Event) {
-                    Set<Condition> uSuccSet = ((Event) u).getPostConditions();
-                    for (Condition uSucc : uSuccSet) {
-                        queue.offer(uSucc);
-                    }
+                    ((Event) u).getPostConditions().forEach(queue::offer);
                 }
             }
         }
@@ -144,9 +129,10 @@ public class LeastCommonPredecessorsAndSuccessors {
         while (!queue.isEmpty()) {
             IBPNode u = queue.poll();
             if (u instanceof Event && ((Event) u).getTransition() == e1.getTransition()) {
-                continue;
-            } else if (this._loopJoinConditions.contains(u)) {
+                System.out.print("");
+            } else if (u instanceof Condition && this._loopJoinConditions.contains(u)) {
                 // hasLoopSucc2 = true;
+                System.out.print("");
             } else if (u instanceof Condition && ((Condition) u).getPlace() == sink) {
                 hasSinkSucc2 = true;
                 if (this.sysReachMap.get(e1.getPetriNetNode()).get(u.getPetriNetNode())) {
@@ -161,15 +147,9 @@ public class LeastCommonPredecessorsAndSuccessors {
                     continue;
                 }
                 if (u instanceof Condition) {
-                    Set<Event> uSuccSet = ((Condition) u).getPostE();
-                    for (Event uSucc : uSuccSet) {
-                        queue.offer(uSucc);
-                    }
+                    ((Condition) u).getPostE().forEach(queue::offer);
                 } else if (u instanceof Event) {
-                    Set<Condition> uSuccSet = ((Event) u).getPostConditions();
-                    for (Condition uSucc : uSuccSet) {
-                        queue.offer(uSucc);
-                    }
+                    ((Event) u).getPostConditions().forEach(queue::offer);
                 }
             }
         }
@@ -186,7 +166,7 @@ public class LeastCommonPredecessorsAndSuccessors {
                 break;
             } else if (lcs == e1) {
                 e1SkipE2 = true;
-            } else if (lcs == e2) {
+            } else {
                 e2SkipE1 = true;
             }
         }
@@ -201,12 +181,9 @@ public class LeastCommonPredecessorsAndSuccessors {
 
     /**
      * filter lcs set to only keep the least common successors
-     *
-     * @param oriLcsSet
-     * @return
      */
     private Set<IBPNode> filterLcsSysSet(Set<IBPNode> oriLcsSet) {
-        Set<IBPNode> lcsSet = new HashSet<IBPNode>();
+        Set<IBPNode> lcsSet = new HashSet<>();
         for (IBPNode lcs : oriLcsSet) {
             Iterator<IBPNode> it = lcsSet.iterator();
             boolean filter = false;
@@ -220,9 +197,7 @@ public class LeastCommonPredecessorsAndSuccessors {
                     it.remove();
                 }
             }
-            if (filter) {
-                continue;
-            } else {
+            if (!filter) {
                 lcsSet.add(lcs);
             }
         }
@@ -231,32 +206,29 @@ public class LeastCommonPredecessorsAndSuccessors {
 
     /**
      * used to check if e1 skips e2 and if e2 skips e1, backwards
-     *
-     * @param e1
-     * @param e2
-     * @return
      */
     private boolean[] hasSkipBackwardSys(Event e1, Event e2) {
-        Set<IBPNode> lcpSet = new HashSet<IBPNode>();
+        Set<IBPNode> lcpSet = new HashSet<>();
         boolean hasSourcePred1 = false, hasSourcePred2 = false;
         // boolean hasLoopPred1 = false, hasLoopPred2 = false;
         Place source = this._sys.getSourcePlaces().iterator().next();
         // step e1
-        Queue<IBPNode> queue = new LinkedList<IBPNode>();
+        Queue<IBPNode> queue = new LinkedList<>();
         queue.offer(e1);
         while (!queue.isEmpty()) {
             IBPNode u = queue.poll();
             if (u instanceof Event && ((Event) u).getTransition() == e2.getTransition()) {
-                continue;
-            } else if (this._loopJoinConditions.contains(u)) {
+                System.out.print("");
+            } else if (u instanceof Condition && this._loopJoinConditions.contains(u)) {
                 // hasLoopPred1 = true;
+                System.out.print("");
             } else if (u instanceof Condition && ((Condition) u).getPlace() == source) {
                 hasSourcePred1 = true;
                 if (this.sysReachMap.get(u.getPetriNetNode()).get(e2.getPetriNetNode())) {
                     lcpSet.add(u);
                 }
             } else if (u instanceof Condition) {
-                Set<Condition> conditions = new HashSet<Condition>();
+                Set<Condition> conditions = new HashSet<>();
                 if (((Condition) u).getMappingConditions() != null) {
                     ((Condition) u).getMappingConditions().stream().filter(c -> c.getPostE().isEmpty())
                             .forEach(conditions::add);
@@ -272,15 +244,12 @@ public class LeastCommonPredecessorsAndSuccessors {
                     }
                     queue.offer(c.getPreEvent());
                 }
-            } else {
+            } else if (u instanceof Event) {
                 if (this.sysReachMap.get(u.getPetriNetNode()).get(e2.getPetriNetNode())) {
                     lcpSet.add(u);
                     continue;
                 }
-                Set<Condition> uPredSet = ((Event) u).getPreConditions();
-                for (Condition uPred : uPredSet) {
-                    queue.offer(uPred);
-                }
+                ((Event) u).getPreConditions().forEach(queue::offer);
             }
         }
         // step e2
@@ -289,16 +258,17 @@ public class LeastCommonPredecessorsAndSuccessors {
         while (!queue.isEmpty()) {
             IBPNode u = queue.poll();
             if (u instanceof Event && ((Event) u).getTransition() == e1.getTransition()) {
-                continue;
-            } else if (this._loopJoinConditions.contains(u)) {
+                System.out.print("");
+            } else if (u instanceof Condition && this._loopJoinConditions.contains(u)) {
                 // hasLoopPred2 = true;
+                System.out.print("");
             } else if (u instanceof Condition && ((Condition) u).getPlace() == source) {
                 hasSourcePred2 = true;
                 if (this.sysReachMap.get(u.getPetriNetNode()).get(e1.getPetriNetNode())) {
                     lcpSet.add(u);
                 }
             } else if (u instanceof Condition) {
-                Set<Condition> conditions = new HashSet<Condition>();
+                Set<Condition> conditions = new HashSet<>();
                 if (((Condition) u).getMappingConditions() != null) {
                     ((Condition) u).getMappingConditions().stream().filter(c -> c.getPostE().isEmpty())
                             .forEach(conditions::add);
@@ -314,15 +284,12 @@ public class LeastCommonPredecessorsAndSuccessors {
                     }
                     queue.offer(c.getPreEvent());
                 }
-            } else {
+            } else if (u instanceof Event) {
                 if (this.sysReachMap.get(u.getPetriNetNode()).get(e1.getPetriNetNode())) {
                     lcpSet.add(u);
                     continue;
                 }
-                Set<Condition> uPredSet = ((Event) u).getPreConditions();
-                for (Condition uPred : uPredSet) {
-                    queue.offer(uPred);
-                }
+                ((Event) u).getPreConditions().forEach(queue::offer);
             }
         }
         lcpSet = filterLcpSysSet(lcpSet);
@@ -338,7 +305,7 @@ public class LeastCommonPredecessorsAndSuccessors {
                 break;
             } else if (lcp == e1) {
                 e1SkipE2 = true;
-            } else if (lcp == e2) {
+            } else {
                 e2SkipE1 = true;
             }
         }
@@ -353,12 +320,9 @@ public class LeastCommonPredecessorsAndSuccessors {
 
     /**
      * filter lcp set to only keep the least common predecessors
-     *
-     * @param oriLcpSet
-     * @return
      */
     private Set<IBPNode> filterLcpSysSet(Set<IBPNode> oriLcpSet) {
-        Set<IBPNode> lcpSet = new HashSet<IBPNode>();
+        Set<IBPNode> lcpSet = new HashSet<>();
         for (IBPNode lcp : oriLcpSet) {
             Iterator<IBPNode> it = lcpSet.iterator();
             boolean filter = false;
@@ -372,9 +336,7 @@ public class LeastCommonPredecessorsAndSuccessors {
                     it.remove();
                 }
             }
-            if (filter) {
-                continue;
-            } else {
+            if (!filter) {
                 lcpSet.add(lcp);
             }
         }
@@ -383,25 +345,22 @@ public class LeastCommonPredecessorsAndSuccessors {
 
     /**
      * used to check if e1 skips e2 and if e2 skips e1, forwards
-     *
-     * @param e1
-     * @param e2
-     * @return
      */
     private boolean[] hasSkipForwardCpu(Event e1, Event e2) {
-        Set<IBPNode> lcsSet = new HashSet<IBPNode>();
+        Set<IBPNode> lcsSet = new HashSet<>();
         boolean hasSinkSucc1 = false, hasSinkSucc2 = false;
         // boolean hasLoopSucc1 = false, hasLoopSucc2 = false;
         Place sink = this._sys.getSinkPlaces().iterator().next();
         // step e1
-        Queue<IBPNode> queue = new LinkedList<IBPNode>();
+        Queue<IBPNode> queue = new LinkedList<>();
         queue.offer(e1);
         while (!queue.isEmpty()) {
             IBPNode u = queue.poll();
             if (u instanceof Event && ((Event) u).getTransition() == e2.getTransition()) {
-                continue;
-            } else if (this._loopJoinConditions.contains(u)) {
+                System.out.print("");
+            } else if (u instanceof Condition && this._loopJoinConditions.contains(u)) {
                 // hasLoopSucc1 = true;
+                System.out.print("");
             } else if (u instanceof Condition && ((Condition) u).getPlace() == sink) {
                 hasSinkSucc1 = true;
                 if (this.cpuReachMap.get(e2).get(u)) {
@@ -416,15 +375,9 @@ public class LeastCommonPredecessorsAndSuccessors {
                     continue;
                 }
                 if (u instanceof Condition) {
-                    Set<Event> uSuccSet = ((Condition) u).getPostE();
-                    for (Event uSucc : uSuccSet) {
-                        queue.offer(uSucc);
-                    }
+                    ((Condition) u).getPostE().forEach(queue::offer);
                 } else if (u instanceof Event) {
-                    Set<Condition> uSuccSet = ((Event) u).getPostConditions();
-                    for (Condition uSucc : uSuccSet) {
-                        queue.offer(uSucc);
-                    }
+                    ((Event) u).getPostConditions().forEach(queue::offer);
                 }
             }
         }
@@ -434,9 +387,10 @@ public class LeastCommonPredecessorsAndSuccessors {
         while (!queue.isEmpty()) {
             IBPNode u = queue.poll();
             if (u instanceof Event && ((Event) u).getTransition() == e1.getTransition()) {
-                continue;
-            } else if (this._loopJoinConditions.contains(u)) {
+                System.out.print("");
+            } else if (u instanceof Condition && this._loopJoinConditions.contains(u)) {
                 // hasLoopSucc2 = true;
+                System.out.print("");
             } else if (u instanceof Condition && ((Condition) u).getPlace() == sink) {
                 hasSinkSucc2 = true;
                 if (this.cpuReachMap.get(e1).get(u)) {
@@ -451,15 +405,9 @@ public class LeastCommonPredecessorsAndSuccessors {
                     continue;
                 }
                 if (u instanceof Condition) {
-                    Set<Event> uSuccSet = ((Condition) u).getPostE();
-                    for (Event uSucc : uSuccSet) {
-                        queue.offer(uSucc);
-                    }
+                    ((Condition) u).getPostE().forEach(queue::offer);
                 } else if (u instanceof Event) {
-                    Set<Condition> uSuccSet = ((Event) u).getPostConditions();
-                    for (Condition uSucc : uSuccSet) {
-                        queue.offer(uSucc);
-                    }
+                    ((Event) u).getPostConditions().forEach(queue::offer);
                 }
             }
         }
@@ -476,7 +424,7 @@ public class LeastCommonPredecessorsAndSuccessors {
                 break;
             } else if (lcs == e1) {
                 e1SkipE2 = true;
-            } else if (lcs == e2) {
+            } else {
                 e2SkipE1 = true;
             }
         }
@@ -491,12 +439,9 @@ public class LeastCommonPredecessorsAndSuccessors {
 
     /**
      * filter lcs set to only keep the least common successors
-     *
-     * @param oriLcsSet
-     * @return
      */
     private Set<IBPNode> filterLcsCpuSet(Set<IBPNode> oriLcsSet) {
-        Set<IBPNode> lcsSet = new HashSet<IBPNode>();
+        Set<IBPNode> lcsSet = new HashSet<>();
         for (IBPNode lcs : oriLcsSet) {
             Iterator<IBPNode> it = lcsSet.iterator();
             boolean filter = false;
@@ -510,9 +455,7 @@ public class LeastCommonPredecessorsAndSuccessors {
                     it.remove();
                 }
             }
-            if (filter) {
-                continue;
-            } else {
+            if (!filter) {
                 lcsSet.add(lcs);
             }
         }
@@ -521,32 +464,29 @@ public class LeastCommonPredecessorsAndSuccessors {
 
     /**
      * used to check if e1 skips e2 and if e2 skips e1, backwards
-     *
-     * @param e1
-     * @param e2
-     * @return
      */
     private boolean[] hasSkipBackwardCpu(Event e1, Event e2) {
-        Set<IBPNode> lcpSet = new HashSet<IBPNode>();
+        Set<IBPNode> lcpSet = new HashSet<>();
         boolean hasSourcePred1 = false, hasSourcePred2 = false;
         // boolean hasLoopPred1 = false, hasLoopPred2 = false;
         Place source = this._sys.getSourcePlaces().iterator().next();
         // step e1
-        Queue<IBPNode> queue = new LinkedList<IBPNode>();
+        Queue<IBPNode> queue = new LinkedList<>();
         queue.offer(e1);
         while (!queue.isEmpty()) {
             IBPNode u = queue.poll();
             if (u instanceof Event && ((Event) u).getTransition() == e2.getTransition()) {
-                continue;
-            } else if (this._loopJoinConditions.contains(u)) {
+                System.out.print("");
+            } else if (u instanceof Condition && this._loopJoinConditions.contains(u)) {
                 // hasLoopPred1 = true;
+                System.out.print("");
             } else if (u instanceof Condition && ((Condition) u).getPlace() == source) {
                 hasSourcePred1 = true;
                 if (this.cpuReachMap.get(u).get(e2)) {
                     lcpSet.add(u);
                 }
             } else if (u instanceof Condition) {
-                Set<Condition> conditions = new HashSet<Condition>();
+                Set<Condition> conditions = new HashSet<>();
                 if (((Condition) u).getMappingConditions() != null) {
                     ((Condition) u).getMappingConditions().stream().filter(c -> c.getPostE().isEmpty())
                             .forEach(conditions::add);
@@ -562,15 +502,12 @@ public class LeastCommonPredecessorsAndSuccessors {
                     }
                     queue.offer(c.getPreEvent());
                 }
-            } else {
+            } else if (u instanceof Event) {
                 if (this.cpuReachMap.get(u).get(e2)) {
                     lcpSet.add(u);
                     continue;
                 }
-                Set<Condition> uPredSet = ((Event) u).getPreConditions();
-                for (Condition uPred : uPredSet) {
-                    queue.offer(uPred);
-                }
+                ((Event) u).getPreConditions().forEach(queue::offer);
             }
         }
         // step e2
@@ -579,16 +516,17 @@ public class LeastCommonPredecessorsAndSuccessors {
         while (!queue.isEmpty()) {
             IBPNode u = queue.poll();
             if (u instanceof Event && ((Event) u).getTransition() == e1.getTransition()) {
-                continue;
-            } else if (this._loopJoinConditions.contains(u)) {
+                System.out.print("");
+            } else if (u instanceof Condition && this._loopJoinConditions.contains(u)) {
                 // hasLoopPred2 = true;
+                System.out.print("");
             } else if (u instanceof Condition && ((Condition) u).getPlace() == source) {
                 hasSourcePred2 = true;
                 if (this.cpuReachMap.get(u).get(e1)) {
                     lcpSet.add(u);
                 }
             } else if (u instanceof Condition) {
-                Set<Condition> conditions = new HashSet<Condition>();
+                Set<Condition> conditions = new HashSet<>();
                 if (((Condition) u).getMappingConditions() != null) {
                     ((Condition) u).getMappingConditions().stream().filter(c -> c.getPostE().isEmpty())
                             .forEach(conditions::add);
@@ -604,15 +542,12 @@ public class LeastCommonPredecessorsAndSuccessors {
                     }
                     queue.offer(c.getPreEvent());
                 }
-            } else {
+            } else if (u instanceof Event) {
                 if (this.cpuReachMap.get(u).get(e1)) {
                     lcpSet.add(u);
                     continue;
                 }
-                Set<Condition> uPredSet = ((Event) u).getPreConditions();
-                for (Condition uPred : uPredSet) {
-                    queue.offer(uPred);
-                }
+                ((Event) u).getPreConditions().forEach(queue::offer);
             }
         }
         lcpSet = filterLcpCpuSet(lcpSet);
@@ -628,7 +563,7 @@ public class LeastCommonPredecessorsAndSuccessors {
                 break;
             } else if (lcp == e1) {
                 e1SkipE2 = true;
-            } else if (lcp == e2) {
+            } else {
                 e2SkipE1 = true;
             }
         }
@@ -643,12 +578,9 @@ public class LeastCommonPredecessorsAndSuccessors {
 
     /**
      * filter lcp set to only keep the least common predecessors
-     *
-     * @param oriLcpSet
-     * @return
      */
     private Set<IBPNode> filterLcpCpuSet(Set<IBPNode> oriLcpSet) {
-        Set<IBPNode> lcpSet = new HashSet<IBPNode>();
+        Set<IBPNode> lcpSet = new HashSet<>();
         for (IBPNode lcp : oriLcpSet) {
             Iterator<IBPNode> it = lcpSet.iterator();
             boolean filter = false;
@@ -662,9 +594,7 @@ public class LeastCommonPredecessorsAndSuccessors {
                     it.remove();
                 }
             }
-            if (filter) {
-                continue;
-            } else {
+            if (!filter) {
                 lcpSet.add(lcp);
             }
         }
@@ -673,13 +603,11 @@ public class LeastCommonPredecessorsAndSuccessors {
 
     /**
      * dfs to get all the XOR-join conditions which ends a loop
-     *
-     * @return
      */
     private Set<Condition> getLoopJoinConditions() {
-        Set<Condition> loopJoinConditions = new HashSet<Condition>();
+        Set<Condition> loopJoinConditions = new HashSet<>();
         Condition source = this._cpu.getInitialCut().iterator().next();
-        Set<INode> visited = new HashSet<INode>();
+        Set<INode> visited = new HashSet<>();
         dfsLoopJoin(source, visited, loopJoinConditions);
         return loopJoinConditions;
     }
@@ -705,54 +633,42 @@ public class LeastCommonPredecessorsAndSuccessors {
 
     /**
      * dfs to get reachable matrix
-     *
-     * @return
      */
     private void initReachMap() {
-        this.sysReachMap = new HashMap<INode, Map<INode, Boolean>>();
-        List<INode> sysNodes = new ArrayList<INode>();
-        for (Transition t : this._sys.getTransitions()) {
-            sysNodes.add((INode) t);
-        }
-        for (Place p : this._sys.getPlaces()) {
-            sysNodes.add((INode) p);
-        }
+        this.sysReachMap = new HashMap<>();
+        List<INode> sysNodes = new ArrayList<>();
+        sysNodes.addAll(this._sys.getTransitions());
+        sysNodes.addAll(this._sys.getPlaces());
         for (int i = 0; i < sysNodes.size(); ++i) {
             INode u = sysNodes.get(i);
-            this.sysReachMap.put(u, new HashMap<INode, Boolean>());
-            for (int j = 0; j < sysNodes.size(); ++j) {
-                INode v = sysNodes.get(j);
+            this.sysReachMap.put(u, new HashMap<>());
+            for (INode v : sysNodes) {
                 this.sysReachMap.get(u).put(v, false);
             }
         }
 
-        this.cpuReachMap = new HashMap<IBPNode, Map<IBPNode, Boolean>>();
-        List<IBPNode> cpuNodes = new ArrayList<IBPNode>();
-        for (Event e : this._cpu.getEvents()) {
-            cpuNodes.add(e);
-        }
-        for (Condition c : this._cpu.getConditions()) {
-            cpuNodes.add(c);
-        }
+        this.cpuReachMap = new HashMap<>();
+        List<IBPNode> cpuNodes = new ArrayList<>();
+        cpuNodes.addAll(this._cpu.getEvents());
+        cpuNodes.addAll(this._cpu.getConditions());
         for (int i = 0; i < cpuNodes.size(); ++i) {
             IBPNode u = cpuNodes.get(i);
-            this.cpuReachMap.put(u, new HashMap<IBPNode, Boolean>());
-            for (int j = 0; j < cpuNodes.size(); ++j) {
-                IBPNode v = cpuNodes.get(j);
+            this.cpuReachMap.put(u, new HashMap<>());
+            for (IBPNode v : cpuNodes) {
                 this.cpuReachMap.get(u).put(v, false);
             }
         }
 
         Condition source = this._cpu.getInitialCut().iterator().next();
         Place sink = this._sys.getSinkPlaces().iterator().next();
-        List<IBPNode> trace = new ArrayList<IBPNode>();
+        List<IBPNode> trace = new ArrayList<>();
         dfsReachMap(source, trace, sink);
     }
 
     private void dfsReachMap(IBPNode u, List<IBPNode> trace, Place sink) {
-        if (this._loopJoinConditions.contains(u)) {
+        if (u instanceof Condition && this._loopJoinConditions.contains(u)) {
             generateReachMap(trace);
-        } else if (u.getPetriNetNode() == sink) {
+        } else if (u instanceof Condition && u.getPetriNetNode() == sink) {
             Condition sinkCondition = (Condition) u;
             if (sinkCondition.isCutoffPost()) {
                 sinkCondition = sinkCondition.getCorrespondingCondition();

@@ -309,8 +309,7 @@ public class Polynomial extends RealVector {
         double rhsNorm = rhs.getNorm();
         if (norm == 0 && rhsNorm == 0) {
             return true;
-        }
-        if ((norm == 0 && rhsNorm != 0) || (norm != 0 && rhsNorm == 0)) {
+        } else if (norm == 0 || rhsNorm == 0) {
             return false;
         }
         for (int i = 0; i < this.getDimension(); ++i) {

@@ -118,7 +118,7 @@ public class AbstractCompletePrefixUnfolding<BPN extends IBPNode<N>, C extends I
      * Javier Esparza, Stefan Roemer, Walter Vogler: An Improvement of McMillan's Unfolding Algorithm. Formal Methods in System Design (FMSD) 20(3):285-310 (2002).
      */
     /*protected void construct() {
-		if (this.sys==null) return;
+        if (this.sys==null) return;
 
 		// CONSTRUCT INITIAL BRANCHING PROCESS
 		M M0 = this.sys.getMarking();

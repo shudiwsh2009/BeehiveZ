@@ -14,8 +14,8 @@ public class Marking extends HashMap<Condition, Integer> {
     private CompletePrefixUnfolding _cpu = null;
     private Event preVisEvent = null;
     private Event preInvEvent = null;
-    private Set<Event> postEnabledEvents = new HashSet<Event>();
-    private Set<Event> postDisabledEvents = new HashSet<Event>();
+    private Set<Event> postEnabledEvents = new HashSet<>();
+    private Set<Event> postDisabledEvents = new HashSet<>();
 
     public Marking() {
     }
@@ -28,17 +28,17 @@ public class Marking extends HashMap<Condition, Integer> {
     }
 
     public static Marking createMarking(CompletePrefixUnfolding cpu) {
-        Marking m = null;
+        Marking m;
         try {
-            m = (Marking) Marking.class.newInstance();
+            m = Marking.class.newInstance();
             m.setCompletePrefixUnfolding(cpu);
             return m;
         } catch (IllegalAccessException exception) {
             exception.printStackTrace();
-            return m;
+            return null;
         } catch (InstantiationException exception) {
             exception.printStackTrace();
-            return m;
+            return null;
         }
     }
 
@@ -50,7 +50,7 @@ public class Marking extends HashMap<Condition, Integer> {
             throw new IllegalArgumentException(
                     "Proposed condition is not part of the associated net!");
         }
-        Integer result = null;
+        Integer result;
         if (tokens == null)
             result = super.remove(c);
         else {
@@ -63,23 +63,19 @@ public class Marking extends HashMap<Condition, Integer> {
         return result == null ? 0 : result;
     }
 
-    public CompletePrefixUnfolding getCPU() {
-        return this._cpu;
-    }
+//    public boolean isMarked(Condition condition) {
+//        return this.get(condition) > 0;
+//    }
 
-    public boolean isMarked(Condition condition) {
-        return this.get(condition) > 0;
-    }
-
-    public Collection<Condition> toMultiSet() {
-        Collection<Condition> result = new ArrayList<Condition>();
-        for (Map.Entry<Condition, Integer> entry : this.entrySet()) {
-            for (int i = 0; i < entry.getValue(); i++) {
-                result.add(entry.getKey());
-            }
-        }
-        return result;
-    }
+//    public Collection<Condition> toMultiSet() {
+//        Collection<Condition> result = new ArrayList<>();
+//        for (Map.Entry<Condition, Integer> entry : this.entrySet()) {
+//            for (int i = 0; i < entry.getValue(); i++) {
+//                result.add(entry.getKey());
+//            }
+//        }
+//        return result;
+//    }
 
     public void fromMultiSet(Collection<Condition> conditions) {
         this.clear();
@@ -191,7 +187,7 @@ public class Marking extends HashMap<Condition, Integer> {
     }
 
     public Set<Event> getEnabledEvents() {
-        Set<Event> enabledEvents = new HashSet<Event>();
+        Set<Event> enabledEvents = new HashSet<>();
         this._cpu.getEvents().stream().filter(this::isEnabled)
                 .forEach(enabledEvents::add);
         return enabledEvents;
@@ -199,9 +195,6 @@ public class Marking extends HashMap<Condition, Integer> {
 
     /**
      * Fire e and update preEvent & postEvents
-     *
-     * @param e
-     * @return
      */
     public boolean fire(Event e) {
         if (!this.isEnabled(e)) {
@@ -216,7 +209,7 @@ public class Marking extends HashMap<Condition, Integer> {
         }
         e.getPreConditions().stream()
                 .forEach(c -> this.put(c, this.get(c) - 1));
-        Set<Event> newEvents = new HashSet<Event>();
+        Set<Event> newEvents = new HashSet<>();
         for (Condition c : e.getPostConditions()) {
             if (c.isCutoffPost() && c.getPostE().isEmpty()) {
                 c = c.getCorrespondingCondition();
@@ -239,9 +232,6 @@ public class Marking extends HashMap<Condition, Integer> {
 
     /**
      * Only fire e without updating preEvent & postEvents
-     *
-     * @param e
-     * @return
      */
     public boolean onlyFire(Event e) {
         if (!this.isEnabled(e)) {
@@ -263,9 +253,9 @@ public class Marking extends HashMap<Condition, Integer> {
         cloneMarking._cpu = this._cpu;
         cloneMarking.preVisEvent = this.preVisEvent;
         cloneMarking.preInvEvent = this.preInvEvent;
-        cloneMarking.postEnabledEvents = new HashSet<Event>(
+        cloneMarking.postEnabledEvents = new HashSet<>(
                 this.postEnabledEvents);
-        cloneMarking.postDisabledEvents = new HashSet<Event>(
+        cloneMarking.postDisabledEvents = new HashSet<>(
                 this.postDisabledEvents);
         return cloneMarking;
     }

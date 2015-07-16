@@ -14,7 +14,7 @@ public class RefinedOrderingRelation {
         importance = i;
     }
 
-    public double intersection(RefinedOrderingRelation r) {
+    public double intersectionWithoutNever(RefinedOrderingRelation r) {
         if (relation == Relation.NEVER && r.relation == Relation.NEVER) {
             return 0;
         } else if (relation != r.relation) {
@@ -26,7 +26,17 @@ public class RefinedOrderingRelation {
         }
     }
 
-    public double union(RefinedOrderingRelation r) {
+    public double intersectionWithNever(RefinedOrderingRelation r) {
+        if (relation != r.relation) {
+            return 0;
+        } else if (adjacency != r.adjacency) {
+            return SDA_WEIGHT * Math.min(importance, r.importance);
+        } else {
+            return Math.min(importance, r.importance);
+        }
+    }
+
+    public double unionWithoutNever(RefinedOrderingRelation r) {
         if (relation == Relation.NEVER && r.relation == Relation.NEVER) {
             return 0;
         } else if (relation == Relation.NEVER) {
@@ -36,6 +46,10 @@ public class RefinedOrderingRelation {
         } else {
             return Math.max(importance, r.importance);
         }
+    }
+
+    public double unionWithNever(RefinedOrderingRelation r) {
+        return Math.max(importance, r.importance);
     }
 
     public boolean equals(Object o) {

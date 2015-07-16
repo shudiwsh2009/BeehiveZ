@@ -18,9 +18,9 @@ public class SequentialDirectAdjacency {
     private NetSystem _sys;
     private CompletePrefixUnfolding _cpu;
     private LeastCommonPredecessorsAndSuccessors _lc;
-    private Set<Marking> visitedMarkings = new HashSet<Marking>();
-    private Map<Event, Marking> enabledMarkingMap = new HashMap<Event, Marking>();
-    private Map<Transition, Set<Transition>> sdaRelations = new HashMap<Transition, Set<Transition>>();
+    private Set<Marking> visitedMarkings = new HashSet<>();
+    private Map<Event, Marking> enabledMarkingMap = new HashMap<>();
+    private Map<Transition, Set<Transition>> sdaRelations = new HashMap<>();
 
     public SequentialDirectAdjacency(CompletePrefixUnfolding cpu,
                                      LeastCommonPredecessorsAndSuccessors lc) {
@@ -36,7 +36,6 @@ public class SequentialDirectAdjacency {
         initialMarking.getPostEnabledEvents().stream()
                 .forEach(e -> enabledMarkingMap.put(e, initialMarking));
         dfsMarking(initialMarking);
-        return;
     }
 
     private void dfsMarking(Marking m) {
@@ -58,7 +57,7 @@ public class SequentialDirectAdjacency {
                     // if postEnabledEvent is visible, add <pre, post> to sda
                     sdaRelations.putIfAbsent(
                             m.getPreVisEvent().getTransition(),
-                            new HashSet<Transition>());
+                            new HashSet<>());
                     sdaRelations.get(m.getPreVisEvent().getTransition()).add(
                             postEvent.getTransition());
                 }
@@ -70,7 +69,7 @@ public class SequentialDirectAdjacency {
             // secondly, fire all the enabled events which is concurrent with
             // preEvent, then check postDisabledEvents
             Marking newMarking = m.clone();
-            Set<Integer> visited = new HashSet<Integer>();
+            Set<Integer> visited = new HashSet<>();
             dfsPostDisabledEvents(newMarking, visited);
         }
     }
@@ -118,7 +117,7 @@ public class SequentialDirectAdjacency {
                         if (isConcurrentInv && isConcurrentVis) {
                             isConcurrent = true;
                             canFireVis = true;
-                        } else if (isConcurrentInv && !isConcurrentVis) {
+                        } else if (isConcurrentInv) {
                             isConcurrent = true;
                             canFireVis = false;
                         }
@@ -129,24 +128,24 @@ public class SequentialDirectAdjacency {
                         }
                         m.onlyFire(e);
                         // check postDisabledEvent every time
-                        for (Event postEvent : m.getPostDisabledEvents()) {
-                            if (m.isEnabled(postEvent)) {
-                                if (!postEvent.getTransition().isSilent()) {
-                                    // if postDisabledEvent is visible, add
-                                    // <pre, post> to sda
-                                    sdaRelations.putIfAbsent(m.getPreVisEvent()
-                                                    .getTransition(),
-                                            new HashSet<Transition>());
-                                    sdaRelations.get(
-                                            m.getPreVisEvent().getTransition())
-                                            .add(postEvent.getTransition());
+                        m.getPostDisabledEvents().stream().filter(m::isEnabled).forEach(
+                                postEvent -> {
+                                    if (!postEvent.getTransition().isSilent()) {
+                                        // if postDisabledEvent is visible, add
+                                        // <pre, post> to sda
+                                        sdaRelations.putIfAbsent(m.getPreVisEvent()
+                                                        .getTransition(),
+                                                new HashSet<>());
+                                        sdaRelations.get(
+                                                m.getPreVisEvent().getTransition())
+                                                .add(postEvent.getTransition());
+                                    }
+                                    // fire it and dfs
+                                    Marking postMarking = m.clone();
+                                    postMarking.fire(postEvent);
+                                    dfsMarking(postMarking);
                                 }
-                                // fire it and dfs
-                                Marking postMarking = m.clone();
-                                postMarking.fire(postEvent);
-                                dfsMarking(postMarking);
-                            }
-                        }
+                        );
                         canFire = true;
                     }
                 }
@@ -182,7 +181,7 @@ public class SequentialDirectAdjacency {
                 if (isConcurrentInv && isConcurrentVis) {
                     isConcurrent = true;
                     canFireVis = true;
-                } else if (isConcurrentInv && !isConcurrentVis) {
+                } else if (isConcurrentInv) {
                     isConcurrent = true;
                     canFireVis = false;
                 }
@@ -194,25 +193,25 @@ public class SequentialDirectAdjacency {
                 Marking copyMarking = m.clone();
                 copyMarking.onlyFire(e);
                 // check postDisabledEvent every time
-                for (Event postEvent : copyMarking.getPostDisabledEvents()) {
-                    if (copyMarking.isEnabled(postEvent)) {
-                        if (!postEvent.getTransition().isSilent()) {
-                            // if postDisabledEvent is visible, add <pre, post>
-                            // to sda
-                            sdaRelations.putIfAbsent(copyMarking
-                                            .getPreVisEvent().getTransition(),
-                                    new HashSet<Transition>());
-                            sdaRelations.get(
-                                    copyMarking.getPreVisEvent()
-                                            .getTransition()).add(
-                                    postEvent.getTransition());
+                copyMarking.getPostDisabledEvents().stream().filter(copyMarking::isEnabled).forEach(
+                        postEvent -> {
+                            if (!postEvent.getTransition().isSilent()) {
+                                // if postDisabledEvent is visible, add <pre, post>
+                                // to sda
+                                sdaRelations.putIfAbsent(copyMarking
+                                                .getPreVisEvent().getTransition(),
+                                        new HashSet<>());
+                                sdaRelations.get(
+                                        copyMarking.getPreVisEvent()
+                                                .getTransition()).add(
+                                        postEvent.getTransition());
+                            }
+                            // fire it and dfs
+                            Marking postMarking = copyMarking.clone();
+                            postMarking.fire(postEvent);
+                            dfsMarking(postMarking);
                         }
-                        // fire it and dfs
-                        Marking postMarking = copyMarking.clone();
-                        postMarking.fire(postEvent);
-                        dfsMarking(postMarking);
-                    }
-                }
+                );
                 dfsPostDisabledEvents(copyMarking, visited);
             }
         }
@@ -220,9 +219,6 @@ public class SequentialDirectAdjacency {
 
     /**
      * check if a event is in a non-free choice structure
-     *
-     * @param e
-     * @return
      */
     private boolean checkEventInNFC(Event e) {
         Set<Condition> preConditions = e.getPreConditions();
@@ -241,13 +237,15 @@ public class SequentialDirectAdjacency {
 
     private Marking getInitialMarking() {
         Marking initialMarking = Marking.createMarking(this._cpu);
-        initialMarking.fromMultiSet(this._cpu.getConditions(this._sys
-                .getSourcePlaces().iterator().next()));
+        if (initialMarking != null) {
+            initialMarking.fromMultiSet(this._cpu.getConditions(this._sys
+                    .getSourcePlaces().iterator().next()));
+        }
         return initialMarking;
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         this.sdaRelations
                 .keySet()
                 .stream()
@@ -263,8 +261,11 @@ public class SequentialDirectAdjacency {
                                     .sorted((a, b) -> a.getName().compareTo(
                                             b.getName()))
                                     .forEach(
-                                            tt -> sb.append("\"" + tt.getName()
-                                                    + "\","));
+                                            tt -> {
+                                                sb.append("\"");
+                                                sb.append(tt.getName());
+                                                sb.append("\",");
+                                            });
                             sb.append("]");
                             sb.append("\r\n");
                         });

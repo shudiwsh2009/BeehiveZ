@@ -93,7 +93,7 @@ public abstract class AbstractGraphNotifier<E extends IHyperEdge<V>, V extends I
     }
 
 	/*@Override
-	public AbstractGraphNotifier<E,V> clone() {
+    public AbstractGraphNotifier<E,V> clone() {
 		@SuppressWarnings("unchecked")
 		AbstractGraphNotifier<E,V> clone = (AbstractGraphNotifier<E,V>) super.clone();
 		

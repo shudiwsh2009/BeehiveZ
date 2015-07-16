@@ -16,7 +16,7 @@ public class SoundUnfoldingMSMS extends SoundUnfolding {
      * @assumption Net system is multi-terminal
      * @assumption Net system is acyclic
      *//*
-	public SoundUnfoldingMSMS(NetSystem sys) {		
+    public SoundUnfoldingMSMS(NetSystem sys) {
 		this.originativeSystem = sys;
 		this.nodeMapping = new HashMap<Node,Node>();
 		

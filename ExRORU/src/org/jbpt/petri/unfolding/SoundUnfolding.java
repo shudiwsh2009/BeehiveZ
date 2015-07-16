@@ -11,7 +11,7 @@ package org.jbpt.petri.unfolding;
 public class SoundUnfolding extends AbstractProperCompletePrefixUnfolding {
 
 	/*private Set<Condition> unsafe	= null;
-	private Set<Condition> deadlock	= null;
+    private Set<Condition> deadlock	= null;
 	
 	protected static DirectedGraphAlgorithms<Flow,Node> dga = new DirectedGraphAlgorithms<Flow,Node>();
 	

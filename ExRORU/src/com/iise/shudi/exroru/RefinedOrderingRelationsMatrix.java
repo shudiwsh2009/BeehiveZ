@@ -58,16 +58,6 @@ public class RefinedOrderingRelationsMatrix {
     private void generateCausalAndInverseCausalMatrix() {
         List<Transition> alObTransitions = new ArrayList<>(this._sys.getObservableTransitions());
         Collections.sort(alObTransitions, (t1, t2) -> t1.getName().compareTo(t2.getName()));
-        Place sinkPlace = this._sys.getSinkPlaces().iterator().next();
-        Condition sinkCondition = this._cpu.getConditions(sinkPlace).iterator().next();
-        if (sinkCondition.isCutoffPost() && sinkCondition.getPostE().isEmpty()) {
-            sinkCondition = sinkCondition.getCorrespondingCondition();
-        }
-        Place sourcePlace = this._sys.getSourcePlaces().iterator().next();
-        Condition sourceCondition = this._cpu.getConditions(sourcePlace).iterator().next();
-        if (sourceCondition.isCutoffPost() && sourceCondition.getPostE().isEmpty()) {
-            sourceCondition = sourceCondition.getCorrespondingCondition();
-        }
         for (int i = 0; i < alObTransitions.size(); ++i) {
             Transition fromTransition = alObTransitions.get(i);
             Set<Event> fromEvents = this._cpu.getEvents(fromTransition);
@@ -202,9 +192,7 @@ public class RefinedOrderingRelationsMatrix {
                         curCondition = curCondition.getCorrespondingCondition();
                     }
                     if (curCondition.getPostE().size() > 1) {
-                        Iterator<Event> itCurSucc = curCondition.getPostE().iterator();
-                        while (itCurSucc.hasNext()) {
-                            IBPNode succ = itCurSucc.next();
+                        for (IBPNode succ : curCondition.getPostE()) {
                             if (succ != trace.get(i + 1)) {
                                 // if has a loop
                                 // the loop must not contain end
@@ -327,6 +315,7 @@ public class RefinedOrderingRelationsMatrix {
 
                 boolean aHasSometimesConcurrent = false;
                 boolean bHasSometimesConcurrent = false;
+                boolean noConcurrent = false;
                 Iterator<Map.Entry<IBPNode, Map<IBPNode, IBPNode>>> outerIter = aConcurrentIn.entrySet().iterator();
                 while (outerIter.hasNext() && (!aHasSometimesConcurrent || !bHasSometimesConcurrent)) {
                     Map.Entry<IBPNode, Map<IBPNode, IBPNode>> outerEntry = outerIter.next();
@@ -337,9 +326,20 @@ public class RefinedOrderingRelationsMatrix {
                         Event b = (Event) innerEntry.getKey();
                         Event lcp = (Event) innerEntry.getValue();
                         boolean[] result = hasSometimesConcurrent(a, b, lcp);
+                        if (result.length == 3) {
+                            noConcurrent = true;
+                        }
                         aHasSometimesConcurrent = result[0] ? result[0] : aHasSometimesConcurrent;
                         bHasSometimesConcurrent = result[1] ? result[1] : bHasSometimesConcurrent;
                     }
+                }
+
+                if (noConcurrent) {
+                    this.concurrentMatrix[this.tName.indexOf(fromTransition.getName())][this.tName
+                            .indexOf(toTransition.getName())].relation = Relation.NEVER;
+                    this.concurrentMatrix[this.tName.indexOf(toTransition.getName())][this.tName
+                            .indexOf(fromTransition.getName())].relation = Relation.NEVER;
+                    continue;
                 }
 
                 if (aConcurrentIn.size() == 0) {
@@ -380,6 +380,9 @@ public class RefinedOrderingRelationsMatrix {
         Condition sourceCondition = this._cpu.getConditions(sourcePlace).iterator().next();
         List<IBPNode> aTrace = findTrace(lcp, a, new HashSet<>());
         List<IBPNode> bTrace = findTrace(lcp, b, new HashSet<>());
+        if (aTrace == null || bTrace == null) {
+            return new boolean[]{false, false, false};
+        }
         // find all the events after xor-split who can skip a|b
         Set<IBPNode> aSkipSplits = new HashSet<>();
         Set<IBPNode> bSkipSplits = new HashSet<>();
@@ -387,6 +390,7 @@ public class RefinedOrderingRelationsMatrix {
         Set<IBPNode> aSkipJoins = new HashSet<>();
         Set<IBPNode> bSkipJoins = new HashSet<>();
         for (int i = 1; i < aTrace.size() - 1; ++i) {
+            final int iCopy = i;
             IBPNode cur = aTrace.get(i);
             if (cur instanceof Condition) {
                 Condition curCondition = (Condition) cur;
@@ -395,13 +399,8 @@ public class RefinedOrderingRelationsMatrix {
                     curCondition = curCondition.getCorrespondingCondition();
                 }
                 if (curCondition.getPostE().size() > 1) {
-                    Iterator<Event> itCurSucc = curCondition.getPostE().iterator();
-                    while (itCurSucc.hasNext()) {
-                        IBPNode succ = itCurSucc.next();
-                        if (succ != aTrace.get(i + 1) && this._lc.getForwardCpuSkip().get(succ).get(a)) {
-                            aSkipSplits.add(succ);
-                        }
-                    }
+                    curCondition.getPostE().stream().filter(succ -> succ != aTrace.get(iCopy + 1)
+                            && this._lc.getForwardCpuSkip().get(succ).get(a)).forEach(aSkipSplits::add);
                 }
                 // xor-join
                 Set<Condition> mappingConditions = new HashSet<>();
@@ -429,6 +428,7 @@ public class RefinedOrderingRelationsMatrix {
             }
         }
         for (int j = 1; j < bTrace.size() - 1; ++j) {
+            final int jCopy = j;
             IBPNode cur = bTrace.get(j);
             if (cur instanceof Condition) {
                 Condition curCondition = (Condition) cur;
@@ -437,13 +437,8 @@ public class RefinedOrderingRelationsMatrix {
                     curCondition = curCondition.getCorrespondingCondition();
                 }
                 if (curCondition.getPostE().size() > 1) {
-                    Iterator<Event> itCurSucc = curCondition.getPostE().iterator();
-                    while (itCurSucc.hasNext()) {
-                        Event succ = itCurSucc.next();
-                        if (succ != bTrace.get(j + 1) && this._lc.getForwardCpuSkip().get(succ).get(b)) {
-                            bSkipSplits.add(succ);
-                        }
-                    }
+                    curCondition.getPostE().stream().filter(succ -> succ != bTrace.get(jCopy + 1)
+                            && this._lc.getForwardCpuSkip().get(succ).get(b)).forEach(bSkipSplits::add);
                 }
                 // xor-join
                 Set<Condition> mappingConditions = new HashSet<>();
@@ -472,18 +467,16 @@ public class RefinedOrderingRelationsMatrix {
         }
         // check xor-split
         Iterator<IBPNode> itAi = aSkipSplits.iterator();
-        while (itAi.hasNext() && (!aHasSometimesConcurrent || !bHasSometimesConcurrent)) {
+        while (itAi.hasNext()) {
             IBPNode ai = itAi.next();
             Iterator<IBPNode> itBj = bSkipSplits.iterator();
-            while (itBj.hasNext() && (!aHasSometimesConcurrent || !bHasSometimesConcurrent)) {
+            while (itBj.hasNext()) {
                 IBPNode bj = itBj.next();
                 if (ai == bj) {
                     itAi.remove();
                     itBj.remove();
                 } else {
-                    aHasSometimesConcurrent = true;
-                    bHasSometimesConcurrent = true;
-                    return new boolean[]{aHasSometimesConcurrent, bHasSometimesConcurrent};
+                    return new boolean[]{true, true};
                 }
             }
         }
@@ -498,7 +491,7 @@ public class RefinedOrderingRelationsMatrix {
         while (itAi.hasNext() && (!aHasSometimesConcurrent || !bHasSometimesConcurrent)) {
             IBPNode ai = itAi.next();
             Iterator<IBPNode> itBj = bSkipJoins.iterator();
-            while (itBj.hasNext() && (!aHasSometimesConcurrent || !bHasSometimesConcurrent)) {
+            while (itBj.hasNext()) {
                 IBPNode bj = itBj.next();
                 Set<IBPNode> _lcpSet = this._lc.getLcpCpuMap().get(ai).get(bj);
                 boolean hasConditionLcp = false;
@@ -576,10 +569,8 @@ public class RefinedOrderingRelationsMatrix {
         if (traceMap.size() == 0) {
             return null;
         }
-        Iterator<Map.Entry<List<IBPNode>, Boolean>> it = traceMap.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<List<IBPNode>, Boolean> entry = it.next();
-            if (entry.getValue() == false) {
+        for (Map.Entry<List<IBPNode>, Boolean> entry : traceMap.entrySet()) {
+            if (!entry.getValue()) {
                 return entry.getKey();
             }
         }
@@ -593,12 +584,9 @@ public class RefinedOrderingRelationsMatrix {
             List<IBPNode> tmp = new ArrayList<>(trace);
             tmp.add(cur);
             traceMap.put(tmp, containLoop);
-            return;
-        } else if (visited.contains(cur)) {
-            return;
-        } else if (cur instanceof Condition && ((Condition) cur).getPlace() == sinkPlace) {
-            return;
-        } else if (this._loopJoinConditions.contains(cur)) {
+        } else if (visited.contains(cur) || (cur instanceof Condition && ((Condition) cur).getPlace() == sinkPlace)) {
+            System.out.print("");
+        } else if (cur instanceof Condition && this._loopJoinConditions.contains(cur)) {
             cur = ((Condition) cur).getCorrespondingCondition();
             dfsFindTrace(cur, end, trace, sinkPlace, true, traceMap, visited);
         } else if (cur instanceof Condition && ((Condition) cur).isCutoffPost()
@@ -654,23 +642,14 @@ public class RefinedOrderingRelationsMatrix {
 
     private void getTransitionNames() {
         this.tName = new ArrayList<>();
-        Set<Transition> alTransitions = this._sys.getTransitions();
-        for (Transition t : alTransitions) {
-            if (t.isObservable()) {
-                this.tName.add(t.getName());
-            }
-        }
+        this._sys.getTransitions().stream().filter(Transition::isObservable).forEach(t -> tName.add(t.getName()));
         Collections.sort(tName);
     }
 
     private void initialiseNetSystem(NetSystem net) {
         net.getNodes().forEach(n -> n.setName(n.getLabel()));
         net.getTransitions().stream().filter(t -> t.getLabel().toLowerCase().startsWith("inv_")).forEach(t -> t.setLabel(""));
-        for (Place p : net.getPlaces()) {
-            if (net.getIncomingEdges(p).isEmpty()) {
-                net.getMarking().put(p, 1);
-            }
-        }
+        net.getPlaces().stream().filter(p -> net.getIncomingEdges(p).isEmpty()).forEach(p -> net.getMarking().put(p, 1));
     }
 
     public void printMatrix() {

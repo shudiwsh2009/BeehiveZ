@@ -29,7 +29,7 @@ public class SimpleStateSpace<F extends IFlow<N>, N extends INode, P extends IPl
     public void createUpToNumberOfMarkings(int numberOfMarkings) {
 
 		/*
-		 * Clone initial marking for storing it as part of the SimpleStateSpace and for 
+         * Clone initial marking for storing it as part of the SimpleStateSpace and for
 		 * being able to reset the net system at the end
 		 */
         @SuppressWarnings("unchecked")
