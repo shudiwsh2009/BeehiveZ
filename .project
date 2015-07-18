@@ -23,4 +23,11 @@
 		<nature>org.apache.derby.ui.derbyEngine</nature>
 		<nature>sf.eclipse.javacc.javaccnature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>ExRORU</name>
+			<type>2</type>
+			<location>D:/Workspace/git-workspace/ExRORU/src</location>
+		</link>
+	</linkedResources>
 </projectDescription>

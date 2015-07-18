@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry excluding="cn/edu/thss/iise/beehivez/server/datamanagement/OplogWriter.aj|cn/edu/thss/iise/beehivez/server/datamanagement/OplogWriter.aj" kind="src" path="src"/>
+	<classpathentry kind="src" path="ExRORU"/>
 	<classpathentry kind="src" path="parsemis/src"/>
 	<classpathentry kind="src" path="lucene3.0.2/contrib/wordnet/src/test"/>
 	<classpathentry kind="src" path="lucene3.0.2/contrib/wordnet/src/java"/>
