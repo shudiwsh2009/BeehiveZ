@@ -13,6 +13,7 @@ import org.jbpt.petri.io.PNMLSerializer;
 import org.processmining.framework.models.petrinet.PetriNet;
 import org.processmining.importing.pnml.PnmlImport;
 
+import com.iise.shudi.exroru.RefinedOrderingRelation;
 import com.iise.shudi.exroru.RormSimilarity;
 
 import cn.edu.thss.iise.beehivez.server.metric.BTSSimilarity_Wang;
@@ -33,6 +34,7 @@ public class SimilarityTriangleEquationBatch {
 
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
+		RefinedOrderingRelation.SDA_WEIGHT = 1.0;
 		SimilarityTriangleEquationBatch batch = new SimilarityTriangleEquationBatch();
 
 		BufferedWriter csvWriter = new BufferedWriter(new FileWriter(ROOT_FOLDER + 

@@ -15,6 +15,7 @@ import org.jbpt.petri.io.PNMLSerializer;
 import org.processmining.framework.models.petrinet.PetriNet;
 import org.processmining.importing.pnml.PnmlImport;
 
+import com.iise.shudi.exroru.RefinedOrderingRelation;
 import com.iise.shudi.exroru.RormSimilarity;
 
 import cn.edu.thss.iise.beehivez.server.metric.BTSSimilarity_Wang;
@@ -49,7 +50,7 @@ public class TagerPropertyCompliance {
 	
 	public TagerPropertyCompliance() throws Exception {
 		loadFile("C:\\Users\\Shudi\\Desktop\\rorm\\17个模型\\");
-		writer = new BufferedWriter(new FileWriter("C:\\Users\\Shudi\\Desktop\\rorm\\17个模型_150718a.csv"));
+		writer = new BufferedWriter(new FileWriter("C:\\Users\\Shudi\\Desktop\\rorm\\17个模型_150719a_sda1.0.csv"));
 		for(String measure : SIM_MEASURE) {
 			writer.write("," + measure);
 		}
@@ -59,6 +60,7 @@ public class TagerPropertyCompliance {
 	
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
+		RefinedOrderingRelation.SDA_WEIGHT = 1.0;
 		TagerPropertyCompliance compliance = new TagerPropertyCompliance();
 		compliance.compute(0, 1);
 		compliance.compute(0, 2);
