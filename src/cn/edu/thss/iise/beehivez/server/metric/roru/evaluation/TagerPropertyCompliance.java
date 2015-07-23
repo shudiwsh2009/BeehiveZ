@@ -15,6 +15,7 @@ import org.jbpt.petri.io.PNMLSerializer;
 import org.processmining.framework.models.petrinet.PetriNet;
 import org.processmining.importing.pnml.PnmlImport;
 
+import com.iise.shudi.bp.BehavioralProfileSimilarity;
 import com.iise.shudi.exroru.RefinedOrderingRelation;
 import com.iise.shudi.exroru.RormSimilarity;
 
@@ -22,7 +23,6 @@ import cn.edu.thss.iise.beehivez.server.metric.BTSSimilarity_Wang;
 import cn.edu.thss.iise.beehivez.server.metric.CausalFootprintSimilarity;
 import cn.edu.thss.iise.beehivez.server.metric.JaccardTARSimilarity;
 import cn.edu.thss.iise.beehivez.server.metric.PetriNetSimilarity;
-import cn.edu.thss.iise.beehivez.server.metric.bp.BehavioralProfileSimilarity;
 import cn.edu.thss.iise.beehivez.server.metric.cfs.CFSSimilarity;
 import cn.edu.thss.iise.beehivez.server.metric.ssdt.SSDTSimilarity;
 import cn.edu.thss.iise.beehivez.server.metric.tager.TagerCGSimilarity;
@@ -30,7 +30,7 @@ import cn.edu.thss.iise.beehivez.server.metric.tager.TagerCGSimilarity;
 public class TagerPropertyCompliance {
 	
 	public static final String[] SIM_MEASURE = {
-		"TAR", "PTS", "SSDT", "BP", "CF", "CFS", "TAGER"
+		"TAR", "PTS", "SSDT", "CF", "CFS", "TAGER"
 	};
 	
 	public static Map<String, PetriNetSimilarity> hmMeasure = new HashMap<String, PetriNetSimilarity>();
@@ -38,7 +38,6 @@ public class TagerPropertyCompliance {
 		hmMeasure.put("TAR", new JaccardTARSimilarity());
 		hmMeasure.put("PTS", new BTSSimilarity_Wang());
 		hmMeasure.put("SSDT", new SSDTSimilarity());
-		hmMeasure.put("BP", new BehavioralProfileSimilarity());
 		hmMeasure.put("CF", new CausalFootprintSimilarity());
 		hmMeasure.put("CFS", new CFSSimilarity());
 		hmMeasure.put("TAGER", new TagerCGSimilarity());
@@ -50,17 +49,18 @@ public class TagerPropertyCompliance {
 	
 	public TagerPropertyCompliance() throws Exception {
 		loadFile("C:\\Users\\Shudi\\Desktop\\rorm\\17个模型\\");
-		writer = new BufferedWriter(new FileWriter("C:\\Users\\Shudi\\Desktop\\rorm\\17个模型_150719a_sda1.0.csv"));
+		writer = new BufferedWriter(new FileWriter("C:\\Users\\Shudi\\Desktop\\rorm\\17个模型_150720a_sda0.0.csv"));
 		for(String measure : SIM_MEASURE) {
 			writer.write("," + measure);
 		}
-		writer.write(",ExRORU");
+		writer.write(",BP,ExRORU");
 		writer.newLine();
 	}
 	
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
-		RefinedOrderingRelation.SDA_WEIGHT = 1.0;
+		RefinedOrderingRelation.SDA_WEIGHT = 0.0;
+		RefinedOrderingRelation.IMPORTANCE = true;
 		TagerPropertyCompliance compliance = new TagerPropertyCompliance();
 		compliance.compute(0, 1);
 		compliance.compute(0, 2);
@@ -94,11 +94,19 @@ public class TagerPropertyCompliance {
 		}
 		NetSystem net1 = nets.get(i);
 		NetSystem net2 = nets.get(j);
-		RormSimilarity rorm = new RormSimilarity();
-		float result = rorm.similarity(net1, net2);
+		// BP
+		BehavioralProfileSimilarity bp = new BehavioralProfileSimilarity();
+		float result = bp.similarity(net1, net2);
 		BigDecimal sim = new BigDecimal(result);
 		sim = sim.setScale(3, BigDecimal.ROUND_HALF_UP);
 		writer.write("," + sim.toString());
+		// ExRORU
+		RormSimilarity rorm = new RormSimilarity();
+		result = rorm.similarity(net1, net2);
+		sim = new BigDecimal(result);
+		sim = sim.setScale(3, BigDecimal.ROUND_HALF_UP);
+		writer.write("," + sim.toString());
+		
 		writer.newLine();
 	}
 	

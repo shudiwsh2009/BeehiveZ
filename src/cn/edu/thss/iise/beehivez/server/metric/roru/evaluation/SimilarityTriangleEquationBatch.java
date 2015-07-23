@@ -13,13 +13,13 @@ import org.jbpt.petri.io.PNMLSerializer;
 import org.processmining.framework.models.petrinet.PetriNet;
 import org.processmining.importing.pnml.PnmlImport;
 
+import com.iise.shudi.bp.BehavioralProfileSimilarity;
 import com.iise.shudi.exroru.RefinedOrderingRelation;
 import com.iise.shudi.exroru.RormSimilarity;
 
 import cn.edu.thss.iise.beehivez.server.metric.BTSSimilarity_Wang;
 import cn.edu.thss.iise.beehivez.server.metric.ExtensiveTARSimilarity;
 import cn.edu.thss.iise.beehivez.server.metric.PetriNetSimilarity;
-import cn.edu.thss.iise.beehivez.server.metric.bp.BehavioralProfileSimilarity;
 import cn.edu.thss.iise.beehivez.server.metric.cfs.CFSSimilarity;
 import cn.edu.thss.iise.beehivez.server.metric.tager.TagerCGSimilarity;
 import cn.edu.thss.iise.beehivez.server.metric.tager.utils.FileUtils;
@@ -34,7 +34,8 @@ public class SimilarityTriangleEquationBatch {
 
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
-		RefinedOrderingRelation.SDA_WEIGHT = 1.0;
+		RefinedOrderingRelation.SDA_WEIGHT = 0.0;
+		RefinedOrderingRelation.IMPORTANCE = true;
 		SimilarityTriangleEquationBatch batch = new SimilarityTriangleEquationBatch();
 
 		BufferedWriter csvWriter = new BufferedWriter(new FileWriter(ROOT_FOLDER + 
@@ -45,7 +46,7 @@ public class SimilarityTriangleEquationBatch {
 		batch.computeBatch(new ExtensiveTARSimilarity(), "TAR", csvWriter);
 		batch.computeBatch(new BTSSimilarity_Wang(), "PTS", csvWriter);
 //		batch.computeBatch(new SSDTSimilarity(), "SSDT", csvWriter);
-		batch.computeBatch(new BehavioralProfileSimilarity(), "BP", csvWriter);
+//		batch.computeBatch(new BehavioralProfileSimilarity(), "BP", csvWriter);
 //		batch.computeBatch(new CausalFootprintSimilarity(), "CF", csvWriter);
 		batch.computeBatch(new CFSSimilarity(), "CFS", csvWriter);
 		batch.computeBatch(new TagerCGSimilarity(), "TAGER", csvWriter);
@@ -187,12 +188,21 @@ public class SimilarityTriangleEquationBatch {
 		double[][] tcSimMatrix = new double[tcNets.size()][tcNets.size()];
 		double[][] sapSimMatrix = new double[sapNets.size()][sapNets.size()];
 		
-		csvWriter.write("ExRORU");
-		csvWriter.write("," + generateSimMatrixNets(dgSimMatrix, dgNets));
+		csvWriter.write("BP");
+		csvWriter.write("," + generateSimMatrixBP(dgSimMatrix, dgNets));
 		csvWriter.write("," + meetNets(dgSimMatrix, dgNets, "DG", meetFolder));
-		csvWriter.write("," + generateSimMatrixNets(tcSimMatrix, tcNets));
+		csvWriter.write("," + generateSimMatrixBP(tcSimMatrix, tcNets));
 		csvWriter.write("," + meetNets(tcSimMatrix, tcNets, "TC", meetFolder));
-		csvWriter.write("," + generateSimMatrixNets(sapSimMatrix, sapNets));
+		csvWriter.write("," + generateSimMatrixBP(sapSimMatrix, sapNets));
+		csvWriter.write("," + meetNets(sapSimMatrix, sapNets, "SAP", meetFolder));
+		csvWriter.newLine();
+		
+		csvWriter.write("ExRORU");
+		csvWriter.write("," + generateSimMatrixExRORU(dgSimMatrix, dgNets));
+		csvWriter.write("," + meetNets(dgSimMatrix, dgNets, "DG", meetFolder));
+		csvWriter.write("," + generateSimMatrixExRORU(tcSimMatrix, tcNets));
+		csvWriter.write("," + meetNets(tcSimMatrix, tcNets, "TC", meetFolder));
+		csvWriter.write("," + generateSimMatrixExRORU(sapSimMatrix, sapNets));
 		csvWriter.write("," + meetNets(sapSimMatrix, sapNets, "SAP", meetFolder));
 		csvWriter.newLine();
 	}
@@ -245,7 +255,7 @@ public class SimilarityTriangleEquationBatch {
 		return sum == 0 ? 0.0 : (double) meet4_2 / (double) sum;
 	}
 	
-	private double generateSimMatrixNets(double[][] simMatrix, List<NetSystem> nets) {
+	private double generateSimMatrixExRORU(double[][] simMatrix, List<NetSystem> nets) {
 		int totalCount = nets.size() * (nets.size() - 1) / 2, finish = 0;
 		long totalTime = 0L;
 		RormSimilarity rorm = new RormSimilarity();
@@ -257,6 +267,31 @@ public class SimilarityTriangleEquationBatch {
 					System.out.println((++finish) + "/" + totalCount + " " + nets.get(p).getName() + " & " + nets.get(q).getName());
 					Long a = System.currentTimeMillis();
 					double sim = rorm.similarity(nets.get(p), nets.get(q));
+					simMatrix[p][q] = simMatrix[q][p] = sim;
+					if(sim == Float.MIN_VALUE) {
+						--totalCount;
+						continue;
+					}
+					Long b = System.currentTimeMillis();
+					totalTime += (b - a);
+				}
+			}
+		}
+		return ((double) totalTime) / ((double) totalCount);
+	}
+	
+	private double generateSimMatrixBP(double[][] simMatrix, List<NetSystem> nets) {
+		int totalCount = nets.size() * (nets.size() - 1) / 2, finish = 0;
+		long totalTime = 0L;
+		BehavioralProfileSimilarity bp = new BehavioralProfileSimilarity();
+		for(int p = 0; p < nets.size(); ++p) {
+			for(int q = p; q < nets.size(); ++q) {
+				if(p == q) {
+					simMatrix[p][q] = 1.0;
+				} else {
+					System.out.println((++finish) + "/" + totalCount + " " + nets.get(p).getName() + " & " + nets.get(q).getName());
+					Long a = System.currentTimeMillis();
+					double sim = bp.similarity(nets.get(p), nets.get(q));
 					simMatrix[p][q] = simMatrix[q][p] = sim;
 					if(sim == Float.MIN_VALUE) {
 						--totalCount;
